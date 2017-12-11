@@ -1,0 +1,125 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "tasks": {
+      "$ref": "#definitions/all-tasks"
+    }
+  },
+  "required": [
+    "name",
+    "tasks"
+  ],
+  "definitions": {
+    "task-base": {
+      "id": "task-base",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "enums": ["job", "parallel", "branch"]
+        },
+        "next": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "type"
+      ]
+    },
+    "all-tasks": {
+      "id": "#all-tasks",
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/definitions/job-task"
+          },
+          {
+            "$ref": "#/definitions/parallel-task"
+          },
+          {
+            "$ref": "#/definitions/branch-task"
+          }
+        ]
+      },
+      "minItems": 1
+    },
+    "job-task": {
+      "id": "#job-task",
+      "allOf": [
+        {
+          "$ref": "#/definitions/task-base"
+        },
+        {
+          "properties": {
+            "job": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "job"
+          ]
+        }
+      ]
+    },
+    "parallel-task": {
+      "id": "#parallel-task",
+      "allOf": [
+        {
+          "$ref": "#/definitions/task-base"
+        },
+        {
+          "properties": {
+            "tasks": {
+              "$ref": "#/definitions/all-tasks"
+            }
+          },
+          "required": [
+            "tasks"
+          ]
+        }
+      ]
+    },
+    "branch-task": {
+      "id": "#branch-task",
+      "allOf": [
+        {
+          "$ref": "#/definitions/task-base"
+        },
+        {
+          "properties": {
+            "tasks": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "condition": {
+                    "type": "string"
+                  },
+                  "next": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "condition",
+                  "next"
+                ]
+              }
+            }
+          },
+          "required": [
+            "tasks"
+          ]
+        }
+      ]
+    }
+  }
+}

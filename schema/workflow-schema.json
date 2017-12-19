@@ -23,7 +23,7 @@
         },
         "type": {
           "type": "string",
-          "enums": ["job", "parallel", "branch"]
+          "enums": ["kubejob", "parallel", "branch"]
         },
         "next": {
           "type": "string"
@@ -40,7 +40,7 @@
       "items": {
         "oneOf": [
           {
-            "$ref": "#/definitions/job-task"
+            "$ref": "#/definitions/kube-job-task"
           },
           {
             "$ref": "#/definitions/parallel-task"
@@ -52,8 +52,8 @@
       },
       "minItems": 1
     },
-    "job-task": {
-      "id": "#job-task",
+    "kube-job-task": {
+      "id": "#kube-job-task",
       "allOf": [
         {
           "$ref": "#/definitions/task-base"

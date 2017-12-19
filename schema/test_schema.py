@@ -24,8 +24,8 @@ class TestWorkflowSchema:
         validate({
             "name": "test_valid",
             "tasks": [{
-                "name": "job-task",
-                "type": "job",
+                "name": "kube-job-task",
+                "type": "kube-job",
                 "job": {
                     "metadata": {
                         "name": "pi"
@@ -52,7 +52,7 @@ class TestWorkflowSchema:
             "tasks": [
                 {
                     "name": "task1",
-                    "type": "job",
+                    "type": "kube-job",
                     "job": {"x": 1},
                     "next": "para1"
                 },
@@ -63,19 +63,19 @@ class TestWorkflowSchema:
                     "tasks": [
                         {
                             "name": "task2",
-                            "type": "job",
+                            "type": "kube-job",
                             "job": {"x": 2},
                         },
                         {
                             "name": "task3",
-                            "type": "job",
+                            "type": "kube-job",
                             "job": {"x": 3},
                         }
                     ]
                 },
                 {
                     "name": "task4",
-                    "type": "job",
+                    "type": "kube-job",
                     "job": {"x": 4},
                 },
             ]
@@ -87,7 +87,7 @@ class TestWorkflowSchema:
             "tasks": [
                 {
                     "name": "task1",
-                    "type": "job",
+                    "type": "kube-job",
                     "job": {"y": "hoge"},
                     "next": "para1"
                 },
@@ -107,12 +107,12 @@ class TestWorkflowSchema:
                 },
                 {
                     "name": "task2",
-                    "type": "job",
+                    "type": "kube-job",
                     "job": {"y": "hoge2"},
                 },
                 {
                     "name": "task3",
-                    "type": "job",
+                    "type": "kube-job",
                     "job": {"y": "hoge3"},
                 }
             ]

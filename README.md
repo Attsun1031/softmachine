@@ -1,6 +1,7 @@
 # jobnetes
 kubernetes workflow engine
 
-### Goライブラリメモ
-* コマンドライン引数解析は標準のflag
-* ログは順標準といえるglog
+## Internal Design
+* Use active record, and no domain object decouple from data layer.
+** Use sqlite3 for testing
+

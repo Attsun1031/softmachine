@@ -7,3 +7,7 @@ import (
 func InjectWorkflowExecutionDao() dao.WorkflowExecutionDao {
 	return &dao.WorkflowExecutionDaoImpl{}
 }
+
+func InjectTaskExecutionDao() dao.TaskExecutionDao {
+	return &dao.TaskExecutionDaoImpl{}
+}

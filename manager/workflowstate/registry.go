@@ -7,15 +7,15 @@ import (
 	"github.com/Attsun1031/jobnetes/model"
 )
 
-type WorkflowExecutionStateProcessorRegistry interface {
+type Registry interface {
 	GetProcessor(*model.WorkflowExecution) (StateProcessor, error)
 }
 
-type WorkflowExecutionStateProcessorRegistryImpl struct {
+type RegistryImpl struct {
 	ScheduleState *ScheduledStateProcessor
 }
 
-func (registry *WorkflowExecutionStateProcessorRegistryImpl) GetProcessor(execution *model.WorkflowExecution) (StateProcessor, error) {
+func (registry *RegistryImpl) GetProcessor(execution *model.WorkflowExecution) (StateProcessor, error) {
 	switch execution.Status {
 	case model.WfScheduled:
 		return registry.ScheduleState, nil

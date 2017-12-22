@@ -5,11 +5,9 @@ import (
 	"testing"
 )
 
-func TestWorkflow_GetJobDef(t *testing.T) {
-	workflow := &Workflow{
-		Definition: `{"name":"test1","tasks":[{"type":"kube-job","name":"task-1","next":"task-2"}]}`,
-	}
-	jobDef := workflow.GetJobDef()
+func TestGetJobDefFromString(t *testing.T) {
+	str := `{"name":"test1","tasks":[{"type":"kube-job","name":"task-1","next":"task-2"}]}`
+	jobDef := GetJobDefFromString(str)
 	expected := &JobDef{
 		Name: "test1",
 		Tasks: []Task{

@@ -8,7 +8,6 @@ const (
 	WfScheduled WorkflowStatusType = iota
 	WfRunning
 	WfPending
-	WfWaitingRetry
 	WfCaceled
 	WfSuccess
 	WfFailed
@@ -18,7 +17,6 @@ var UncompletedWorkflowStatuses = []WorkflowStatusType{
 	WfRunning,
 	WfScheduled,
 	WfPending,
-	WfWaitingRetry,
 }
 
 type WorkflowExecution struct {
@@ -31,8 +29,25 @@ type WorkflowExecution struct {
 	Status     WorkflowStatusType `gorm:"not null"`
 	Input      string             `gorm:"type:json;not null"`
 	Output     string             `gorm:"type:json;not null"`
-	RetryCount int                `gorm:"not null;default:0"`
-	Errors     []ExecutionError   `gorm:"type:json;not null"`
+	Definition string             `gorm:"type:json;not null"`
+	Attempt    int                `gorm:"not null;default:1"`
+	ErrorMsg   string
 	CreatedAt  *time.Time
 	UpdatedAt  *time.Time
+
+	jobDef *JobDef `gorm:"-"`
+}
+
+type ExecutionError struct {
+	cause   string
+	message string
+}
+
+func (execution *WorkflowExecution) GetJobDef() *JobDef {
+	if execution.jobDef != nil {
+		return execution.jobDef
+	}
+
+	execution.jobDef = GetJobDefFromString(execution.Definition)
+	return execution.jobDef
 }

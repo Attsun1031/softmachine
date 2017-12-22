@@ -8,7 +8,7 @@ import (
 
 func TestWorkflowExecutionStateProcessorRegistryImpl_GetProcessor(t *testing.T) {
 	scheduleState := &ScheduledStateProcessor{}
-	target := &WorkflowExecutionStateProcessorRegistryImpl{
+	target := &RegistryImpl{
 		ScheduleState: scheduleState,
 	}
 

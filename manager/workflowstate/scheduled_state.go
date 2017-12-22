@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/Attsun1031/jobnetes/dao"
+	"github.com/Attsun1031/jobnetes/manager/taskexecutor"
 	"github.com/Attsun1031/jobnetes/model"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"github.com/jinzhu/gorm"
@@ -14,13 +15,14 @@ import (
 
 type ScheduledStateProcessor struct {
 	WorkflowExecutionDao dao.WorkflowExecutionDao
+	TaskExecutorFactory  taskexecutor.Factory
 }
 
 func (scheduledState *ScheduledStateProcessor) ToNextState(execution *model.WorkflowExecution, db *gorm.DB) (bool, error) {
 	log.Logger.Info("Scheduled state.")
 
 	// Read job definition
-	jobDef := execution.Workflow.GetJobDef()
+	jobDef := execution.GetJobDef()
 
 	// Load latest state
 	executionCurrent := scheduledState.WorkflowExecutionDao.FindById(execution.ID, db.Set("gorm:query_option", "FOR UPDATE"))
@@ -31,7 +33,11 @@ func (scheduledState *ScheduledStateProcessor) ToNextState(execution *model.Work
 
 	// Start first job
 	task := jobDef.GetStartTask()
-	err := task.RequestTask(executionCurrent)
+	executor, err := scheduledState.TaskExecutorFactory.GetTaskExecutor(task)
+	if err != nil {
+		return false, err
+	}
+	err = executor.Execute(executionCurrent, db)
 	if err != nil {
 		return false, errors.New(fmt.Sprintf("Failed to request task. Name=%s cause=%s", task.GetName(), err))
 	}

@@ -17,7 +17,7 @@ const pollIntervalSec = 10 * time.Second
 type WorkflowManagerMain struct {
 	Db                                 *gorm.DB
 	WorkflowExecutionDao               dao.WorkflowExecutionDao
-	WorkflowExecutionProcessorRegistry workflowstate.WorkflowExecutionStateProcessorRegistry
+	WorkflowExecutionProcessorRegistry workflowstate.Registry
 }
 
 func (manager *WorkflowManagerMain) Run() {

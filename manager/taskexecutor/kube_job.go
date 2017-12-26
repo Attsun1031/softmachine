@@ -9,12 +9,14 @@ import (
 	"github.com/Attsun1031/jobnetes/model"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"github.com/jinzhu/gorm"
-	"k8s.io/client-go/rest"
+	"k8s.io/api/batch/v1"
+	"k8s.io/client-go/kubernetes"
 )
 
 type KubeJobTaskExecutor struct {
 	Task             *model.KubeJobTask
 	TaskExecutionDao dao.TaskExecutionDao
+	KubeClient       kubernetes.Interface
 }
 
 func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB) error {
@@ -29,11 +31,17 @@ func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *go
 		StartedAt:         &startedAt,
 		Status:            model.TaskRunning,
 		Input:             we.Input,
+		Output:            "{}",
 	}
 	executor.TaskExecutionDao.Update(te, db)
 
-	// kubejobを起動
-	config, err := rest.InClusterConfig()
-
-	return nil
+	// start kubejob
+	// k8s.io/client-go/kubernetes/typed/batch/v1/job.go#Createのパクリ
+	result := &v1.Job{}
+	return executor.KubeClient.BatchV1().RESTClient().Post().
+		Namespace("default").
+		Resource("jobs").
+		Body([]byte(task.KubeJobSpec)).
+		Do().
+		Into(result)
 }

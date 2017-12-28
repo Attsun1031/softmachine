@@ -1,17 +1,13 @@
-package log
+package config
 
 import (
-	"github.com/Attsun1031/jobnetes/utils/consts"
 	"github.com/sirupsen/logrus"
-	"os"
-	"strings"
+	"github.com/spf13/viper"
 )
 
 type LogConfig struct {
 	LogLevel logrus.Level
 }
-
-const defaultLogLevel = logrus.InfoLevel
 
 func LoadLogConfig() *LogConfig {
 	return &LogConfig{
@@ -20,11 +16,11 @@ func LoadLogConfig() *LogConfig {
 }
 
 func getLevel() logrus.Level {
-	levelStr := strings.ToLower(os.Getenv(consts.LogLevel))
+	levelStr := viper.GetString("log.level")
 	for _, l := range logrus.AllLevels {
 		if levelStr == l.String() {
 			return l
 		}
 	}
-	return defaultLogLevel
+	panic("Log level not set.")
 }

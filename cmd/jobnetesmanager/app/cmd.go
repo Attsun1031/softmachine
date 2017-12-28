@@ -1,12 +1,12 @@
 package app
 
 import (
-	"fmt"
-
 	"github.com/Attsun1031/jobnetes/dao/db"
 	"github.com/Attsun1031/jobnetes/di"
 	"github.com/Attsun1031/jobnetes/kubernetes"
 	"github.com/Attsun1031/jobnetes/manager"
+	"github.com/Attsun1031/jobnetes/utils/config"
+	"github.com/Attsun1031/jobnetes/utils/log"
 	"github.com/spf13/cobra"
 )
 
@@ -20,10 +20,10 @@ func NewJobmanagerCommand() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) {
-	fmt.Println("jobnetesmanager run")
-	manager.InitConfig()
-	d := db.Connect(manager.ManagerConfig.DbConfig)
-	kubeClient := kubernetes.GetClient(manager.ManagerConfig.KubeConfig)
+	config.InitConfig()
+	log.SetupLogger(config.JobnetesConfig.LogConfig)
+	d := db.Connect(config.JobnetesConfig.DbConfig)
+	kubeClient := kubernetes.GetClient(config.JobnetesConfig.KubeConfig)
 	mgr := &manager.WorkflowManagerMain{
 		Db:                                 d,
 		WorkflowExecutionDao:               di.InjectWorkflowExecutionDao(),

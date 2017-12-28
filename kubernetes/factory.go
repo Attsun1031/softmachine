@@ -1,42 +1,43 @@
 package kubernetes
 
 import (
+	"github.com/Attsun1031/jobnetes/utils/config"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
-func GetClient(config *KubeConfig) *kubernetes.Clientset {
+func GetClient(config *config.KubernetesConfig) *kubernetes.Clientset {
 	if config.InCluster {
 		return getInClusterClient()
 	} else {
-		return getOutOfClusterKubeClient(config.KubeMasterUrl, config.ConfigPath)
+		return getOutOfClusterKubeClient(config.MasterUrl, config.ConfigPath)
 	}
 }
 
 func getInClusterClient() *kubernetes.Clientset {
-	config, err := rest.InClusterConfig()
+	c, err := rest.InClusterConfig()
 	if err != nil {
 		panic(err.Error())
 	}
 	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(config)
+	cli, err := kubernetes.NewForConfig(c)
 	if err != nil {
 		panic(err.Error())
 	}
-	return clientset
+	return cli
 }
 
 func getOutOfClusterKubeClient(masterUrl string, configPath string) *kubernetes.Clientset {
-	config, err := clientcmd.BuildConfigFromFlags(masterUrl, configPath)
+	c, err := clientcmd.BuildConfigFromFlags(masterUrl, configPath)
 	if err != nil {
 		panic(err.Error())
 	}
 
 	// create the clientset
-	clientset, err := kubernetes.NewForConfig(config)
+	cli, err := kubernetes.NewForConfig(c)
 	if err != nil {
 		panic(err.Error())
 	}
-	return clientset
+	return cli
 }

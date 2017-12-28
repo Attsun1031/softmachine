@@ -4,16 +4,18 @@ import (
 	"fmt"
 
 	"github.com/Attsun1031/jobnetes/kubernetes"
+	"github.com/Attsun1031/jobnetes/utils/config"
 	batchv1 "k8s.io/api/batch/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	kubernetes2 "k8s.io/client-go/kubernetes"
 )
 
 func main() {
-	cli := kubernetes.GetClient(kubernetes.LoadKubeConfig())
+	config.InitConfig()
+	cli := kubernetes.GetClient(config.JobnetesConfig.KubeConfig)
 	//hello(cli)
 
-	kubeJobSpec := `{"spec": {"template": {"spec": {"containers": [{"name": "pi", "image": "perl", "command": ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]}], "restartPolicy": "Never"}}}, "metadata": {"name": "pi-3"}}`
+	kubeJobSpec := `{"spec": {"template": {"spec": {"containers": [{"name": "pi", "image": "perl", "command": ["perl",  "-Mbignum=bpi", "-wle", "print bpi(2000)"]}], "restartPolicy": "Never"}}}, "metadata": {"name": "pi-4"}}`
 	result := &batchv1.Job{}
 	err := cli.BatchV1().RESTClient().Post().
 		Namespace("default").

@@ -1,8 +1,10 @@
 package log
 
 import (
-	"github.com/sirupsen/logrus"
 	"os"
+
+	"github.com/Attsun1031/jobnetes/utils/config"
+	"github.com/sirupsen/logrus"
 )
 
 var Logger *logrus.Logger
@@ -12,7 +14,7 @@ var ErrLogger = &logrus.Logger{
 	Level:     logrus.ErrorLevel,
 }
 
-func SetupLogger(config *LogConfig) {
+func SetupLogger(config *config.LogConfig) {
 	levels := []logrus.Level{logrus.ErrorLevel, logrus.PanicLevel, logrus.FatalLevel}
 	hook := NewMultiLogHook(levels, ErrLogger)
 	Logger = &logrus.Logger{

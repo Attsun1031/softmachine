@@ -48,9 +48,10 @@ func (manager *WorkflowManagerMain) processWorkflowState() {
 		}
 
 		tx := manager.Db.Begin()
-		stateChanged, err := stateProcessor.ToNextState(exec, manager.Db)
+		stateChanged, err := stateProcessor.ToNextState(exec, tx)
 		if err != nil {
 			tx.Rollback()
+			log.Logger.Error(fmt.Sprintf("Failed to change state for wid=%d cause=%s", exec.ID, err))
 			continue
 		}
 		tx.Commit()

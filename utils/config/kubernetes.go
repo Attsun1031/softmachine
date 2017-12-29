@@ -5,15 +5,17 @@ import (
 )
 
 type KubernetesConfig struct {
-	InCluster  bool
-	ConfigPath string
-	MasterUrl  string
+	InCluster    bool
+	ConfigPath   string
+	MasterUrl    string
+	JobNamespace string
 }
 
 func LoadKubernetesConfig() *KubernetesConfig {
 	return &KubernetesConfig{
-		InCluster:  viper.GetBool("k8s.in-cluster"),
-		ConfigPath: viper.GetString("k8s.config-path"),
-		MasterUrl:  viper.GetString("k8s.master-url"),
+		InCluster:    viper.GetBool("k8s.in-cluster"),
+		ConfigPath:   viper.GetString("k8s.config-path"),
+		MasterUrl:    viper.GetString("k8s.master-url"),
+		JobNamespace: viper.GetString("k8s.job-namespace"),
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Attsun1031/jobnetes/utils/log"
+	"k8s.io/api/batch/v1"
 )
 
 type JobDefProvider interface {
@@ -12,8 +13,12 @@ type JobDefProvider interface {
 }
 
 func GetJobDefFromString(jobDefStr string) *JobDef {
+	var err error
 	rawJobDef := &_RawJobDef{}
-	json.Unmarshal([]byte(jobDefStr), rawJobDef)
+	err = json.Unmarshal([]byte(jobDefStr), rawJobDef)
+	if err != nil {
+		log.Logger.Fatal(err)
+	}
 	jobDef := &JobDef{Name: rawJobDef.Name}
 
 	tasks := make([]Task, len(rawJobDef.Tasks))
@@ -24,7 +29,17 @@ func GetJobDefFromString(jobDefStr string) *JobDef {
 		next := decoded["next"]
 		switch tp {
 		case "kube-job":
-			kjt := &KubeJobTask{Name: name}
+			var b []byte
+			b, err = json.Marshal(decoded["job"])
+			if err != nil {
+				log.Logger.Fatal(err)
+			}
+			j := &v1.Job{}
+			err = json.Unmarshal(b, j)
+			if err != nil {
+				log.Logger.Fatal(err)
+			}
+			kjt := &KubeJobTask{Name: name, KubeJobSpec: *j}
 			if next != nil {
 				kjt.NextTaskName = next.(string)
 			}

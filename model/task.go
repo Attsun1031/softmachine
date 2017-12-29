@@ -1,5 +1,7 @@
 package model
 
+import "k8s.io/api/batch/v1"
+
 type Task interface {
 	GetName() string
 	GetJobType() string
@@ -8,7 +10,7 @@ type Task interface {
 type KubeJobTask struct {
 	Name         string
 	NextTaskName string
-	KubeJobSpec  string // TODO: Use Job in https://github.com/kubernetes/api/blob/master/batch/v1/types.go
+	KubeJobSpec  v1.Job
 }
 
 func (task *KubeJobTask) GetName() string {

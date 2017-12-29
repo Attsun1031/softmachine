@@ -7,9 +7,9 @@ import (
 )
 
 type _JobnetesConfig struct {
-	DbConfig   *DbConfig
-	LogConfig  *LogConfig
-	KubeConfig *KubernetesConfig
+	DbConfig         *DbConfig
+	LogConfig        *LogConfig
+	KubernetesConfig *KubernetesConfig
 }
 
 var JobnetesConfig *_JobnetesConfig
@@ -25,8 +25,8 @@ func InitConfig() {
 	}
 
 	JobnetesConfig = &_JobnetesConfig{
-		DbConfig:   LoadDbConfig(),
-		LogConfig:  LoadLogConfig(),
-		KubeConfig: LoadKubernetesConfig(),
+		DbConfig:         LoadDbConfig(),
+		LogConfig:        LoadLogConfig(),
+		KubernetesConfig: LoadKubernetesConfig(),
 	}
 }

@@ -9,3 +9,4 @@ k8s:
   in-cluster: false
   config-path: /Users/tatsuya.atsumi/go/jobnetes/src/github.com/Attsun1031/jobnetes/cmd/example/config
   master-url: "https://192.168.99.100:8443"
+  job-namespace: default

@@ -37,9 +37,9 @@ func (scheduledState *ScheduledStateProcessor) ToNextState(execution *model.Work
 	if err != nil {
 		return false, err
 	}
-	err = executor.Execute(executionCurrent, db)
+	err = executor.Execute(executionCurrent, db, executionCurrent.Input)
 	if err != nil {
-		return false, errors.New(fmt.Sprintf("Failed to request task. Name=%s cause=%s", task.GetName(), err))
+		return false, errors.New(fmt.Sprintf("Failed to request task. ExecutionName=%s cause=%s", task.GetName(), err))
 	}
 
 	// Change state

@@ -23,6 +23,7 @@ func run(cmd *cobra.Command, args []string) {
 	config.InitConfig()
 	log.SetupLogger(config.JobnetesConfig.LogConfig)
 	d := db.Connect(config.JobnetesConfig.DbConfig)
+	d.SetLogger(log.Logger)
 	kubeClient := kubernetes.GetClient(config.JobnetesConfig.KubernetesConfig)
 	mgr := &manager.WorkflowManagerMain{
 		Db:                                 d,

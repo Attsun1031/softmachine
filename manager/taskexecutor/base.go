@@ -6,5 +6,5 @@ import (
 )
 
 type TaskExecutor interface {
-	Execute(*model.WorkflowExecution, *gorm.DB) error
+	Execute(*model.WorkflowExecution, *gorm.DB, string) error
 }

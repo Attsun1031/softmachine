@@ -6,10 +6,19 @@ import (
 )
 
 func InjectWorkflowExecutionStateProcessorFactory(kubeClient kubernetes.Interface) workflowstate.Registry {
+	workflowExecutionDao := InjectWorkflowExecutionDao()
+	taskExecutionDao := InjectTaskExecutionDao()
+	taskExecutorFactory := InjectTaskExecutorFactory(kubeClient)
 	return &workflowstate.RegistryImpl{
 		ScheduleState: &workflowstate.ScheduledStateProcessor{
-			WorkflowExecutionDao: InjectWorkflowExecutionDao(),
-			TaskExecutorFactory:  InjectTaskExecutorFactory(kubeClient),
+			WorkflowExecutionDao: workflowExecutionDao,
+			TaskExecutorFactory:  taskExecutorFactory,
+		},
+		RunningState: &workflowstate.RunningStateProcessor{
+			WorkflowExecutionDao: workflowExecutionDao,
+			TaskExecutionDao:     taskExecutionDao,
+			TaskExecutorFactory:  taskExecutorFactory,
+			KubeClient:           kubeClient,
 		},
 	}
 }

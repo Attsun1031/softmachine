@@ -7,8 +7,6 @@ type WorkflowStatusType int
 const (
 	WfScheduled WorkflowStatusType = iota
 	WfRunning
-	WfPending
-	WfCaceled
 	WfSuccess
 	WfFailed
 )
@@ -16,7 +14,6 @@ const (
 var UncompletedWorkflowStatuses = []WorkflowStatusType{
 	WfRunning,
 	WfScheduled,
-	WfPending,
 }
 
 type WorkflowExecution struct {

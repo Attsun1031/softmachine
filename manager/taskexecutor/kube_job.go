@@ -19,18 +19,18 @@ type KubeJobTaskExecutor struct {
 	KubeClient       kubernetes.Interface
 }
 
-func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB) error {
+func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB, input string) error {
 	task := executor.Task
-	log.Logger.Info(fmt.Sprintf("Requesting task. Name=%s Type=%s", task.Name, task.GetJobType()))
+	log.Logger.Info(fmt.Sprintf("Requesting task. ExecutionName=%s Type=%s", task.Name, task.GetJobType()))
 
 	// create execution record
 	startedAt := time.Now()
 	te := &model.TaskExecution{
 		WorkflowExecution: we,
-		Name:              task.Name,
+		TaskName:          task.Name,
 		StartedAt:         &startedAt,
 		Status:            model.TaskRunning,
-		Input:             we.Input,
+		Input:             input,
 		Output:            "{}",
 	}
 	executor.TaskExecutionDao.Update(te, db)
@@ -40,7 +40,7 @@ func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *go
 		we.ID,
 		te.ID,
 		time.Now().Format("2006-01-02-15-04-05-99"))
-	te.Name = name
+	te.ExecutionName = name
 	executor.TaskExecutionDao.Update(te, db)
 
 	// start kubernetes job

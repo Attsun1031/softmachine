@@ -19,7 +19,7 @@ func GetJobDefFromString(jobDefStr string) *JobDef {
 	if err != nil {
 		log.Logger.Fatal(err)
 	}
-	jobDef := &JobDef{Name: rawJobDef.Name}
+	jobDef := &JobDef{}
 
 	tasks := make([]Task, len(rawJobDef.Tasks))
 	for i, t := range rawJobDef.Tasks {
@@ -62,7 +62,6 @@ type _RawJobDef struct {
 }
 
 type JobDef struct {
-	Name  string
 	Tasks []Task
 }
 
@@ -73,6 +72,23 @@ func (jobDef *JobDef) GetStartTask() Task {
 
 // Get next job
 // Next job is decided by tasks' status which belong to the execution
-func (jobDef *JobDef) GetNextTask(execution *WorkflowExecution) Task {
+func (jobDef *JobDef) GetNextTask(te *TaskExecution) Task {
+	next := ""
+	for _, t := range jobDef.Tasks {
+		if t.GetName() == te.TaskName {
+			next = t.GetNextTaskName()
+			break
+		}
+	}
+	if next == "" {
+		return nil
+	}
+
+	for _, t := range jobDef.Tasks {
+		if t.GetName() == next {
+			return t
+		}
+	}
+	log.Logger.Fatal(fmt.Sprintf("Next task %s not found in job definition.", next))
 	return nil
 }

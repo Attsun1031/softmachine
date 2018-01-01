@@ -25,6 +25,9 @@ func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) Update(execution *mode
 
 func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) FindUncompletedWorkflowExecs(db *gorm.DB) []*model.WorkflowExecution {
 	var workflowExecutions []*model.WorkflowExecution
-	db.Preload("Workflow").Where("status in (?)", model.UncompletedWorkflowStatuses).Find(&workflowExecutions)
+	db.
+		Preload("Workflow").
+		Where("status in (?)", model.UncompletedWorkflowStatuses).
+		Find(&workflowExecutions)
 	return workflowExecutions
 }

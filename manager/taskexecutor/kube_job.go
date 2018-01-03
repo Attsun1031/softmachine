@@ -21,7 +21,7 @@ type KubeJobTaskExecutor struct {
 
 func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB, input string) error {
 	task := executor.Task
-	log.Logger.Info(fmt.Sprintf("Requesting task. ExecutionName=%s Type=%s", task.Name, task.GetJobType()))
+	log.Logger.Infof("Requesting task. ExecutionName=%s Type=%s", task.Name, task.GetJobType())
 
 	// create execution record
 	startedAt := time.Now()

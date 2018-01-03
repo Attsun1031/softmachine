@@ -3,8 +3,6 @@ package manager
 import (
 	"time"
 
-	"fmt"
-
 	"github.com/Attsun1031/jobnetes/dao"
 	"github.com/Attsun1031/jobnetes/manager/workflowstate"
 	"github.com/Attsun1031/jobnetes/model"
@@ -31,12 +29,11 @@ func (manager *WorkflowManagerMain) Run() {
 func (manager *WorkflowManagerMain) processWorkflowState() {
 	// Load running workflows
 	log.Logger.Info("Running workflow state manager")
-	//loadData()
 
 	uncompletedExecs := manager.WorkflowExecutionDao.FindUncompletedWorkflowExecs(manager.Db)
 
 	for _, exec := range uncompletedExecs {
-		log.Logger.Info(fmt.Sprintf("Process WorkflowExecution: id=%d", exec.ID))
+		log.Logger.Infof("Process WorkflowExecution: id=%d", exec.ID)
 
 		// get state object
 		prevState := exec.Status
@@ -51,16 +48,16 @@ func (manager *WorkflowManagerMain) processWorkflowState() {
 		stateChanged, err := stateProcessor.ToNextState(exec, tx)
 		if err != nil {
 			tx.Rollback()
-			log.Logger.Error(fmt.Sprintf("Failed to change state for wid=%d cause=%s", exec.ID, err))
+			log.Logger.Errorf("Failed to change state for wid=%d cause=%s", exec.ID, err)
 			continue
 		}
 		tx.Commit()
 
 		newState := exec.Status
 		if stateChanged {
-			log.Logger.Info(fmt.Sprintf("Workflow state changed. id=%d prev=%d to=%d", exec.ID, prevState, newState))
+			log.Logger.Infof("Workflow state changed. id=%d prev=%d to=%d", exec.ID, prevState, newState)
 		} else if err != nil {
-			log.Logger.Error(fmt.Sprintf("Failed to change state. id=%d cause='%s'", exec.ID, err))
+			log.Logger.Errorf("Failed to change state. id=%d cause='%s'", exec.ID, err)
 		}
 	}
 }

@@ -79,7 +79,7 @@ func runNextTask(processor *RunningStateProcessor, execution *model.WorkflowExec
 		}
 		runNextTask = true
 
-		log.Logger.Info(fmt.Sprintf("Run next task. current-exec-name=%s next-name=%s", te.ExecutionName, next.GetName()))
+		log.Logger.Infof("Run next task. current-exec-name=%s next-name=%s", te.ExecutionName, next.GetName())
 		executor, err := processor.TaskExecutorFactory.GetTaskExecutor(next)
 		if err != nil {
 			return runNextTask, err

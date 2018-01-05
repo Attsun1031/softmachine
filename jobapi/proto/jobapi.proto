@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package jobapi;
+
+service Jobapi {
+    rpc StartWorkflow (WorkflowStartRequest) returns (WorkflowStartResponse);
+}
+
+message WorkflowStartRequest {
+    int64 workflow_id = 1;
+    string exec_name = 2;
+    bytes input = 3;
+}
+
+message WorkflowStartResponse {
+    int64 id = 1;
+}

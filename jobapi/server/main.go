@@ -1,51 +1,34 @@
 package main
 
 import (
-	"log"
 	"net"
 
 	"fmt"
 
-	"encoding/json"
-
 	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi"
-	"golang.org/x/net/context"
+	"github.com/Attsun1031/jobnetes/jobapi/server/apiserver"
+	"github.com/Attsun1031/jobnetes/jobapi/server/interceptor"
+	"github.com/Attsun1031/jobnetes/utils/config"
+	"github.com/Attsun1031/jobnetes/utils/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
-const (
-	port = ":50051"
-)
-
-type server struct{}
-
-type SampleInput struct {
-	Name string
-	Age  int
-}
-
-func (s *server) StartWorkflow(ctx context.Context, request *jobapi_pb.WorkflowStartRequest) (*jobapi_pb.WorkflowStartResponse, error) {
-	b := request.GetInput()
-	i := &SampleInput{}
-	err := json.Unmarshal(b, i)
-	if err != nil {
-		println(err)
-	}
-	fmt.Printf("Receive request. id=%v name=%v input.Name=%v input.Age=%v\n", request.GetWorkflowId(), request.GetExecName(), i.Name, i.Age)
-	return &jobapi_pb.WorkflowStartResponse{Id: 1}, nil
-}
-
 func main() {
-	lis, err := net.Listen("tcp", port)
+	config.InitConfig()
+	log.SetupLogger(config.JobnetesConfig.LogConfig)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", config.JobnetesConfig.JobApiConfig.Port))
 	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
+		log.Logger.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
-	jobapi_pb.RegisterJobapiServer(s, &server{})
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(interceptor.UnaryInterceptor),
+	)
+	jobapi_pb.RegisterJobapiServer(s, apiserver.MakeJobApiServer())
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
+		log.Logger.Fatalf("failed to serve: %v", err)
 	}
 }

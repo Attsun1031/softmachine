@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin/json"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/metadata"
 )
 
 const (
@@ -34,7 +35,9 @@ func main() {
 		println(err)
 		return
 	}
-	r, err := c.StartWorkflow(context.Background(), &jobapi_pb.WorkflowStartRequest{
+	md := metadata.Pairs("username", "jobnetesadmin", "password", "test")
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+	r, err := c.StartWorkflow(ctx, &jobapi_pb.WorkflowStartRequest{
 		WorkflowId: 1,
 		ExecName:   "test",
 		Input:      b,

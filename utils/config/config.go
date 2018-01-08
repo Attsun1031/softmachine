@@ -10,6 +10,7 @@ type _JobnetesConfig struct {
 	DbConfig         *DbConfig
 	LogConfig        *LogConfig
 	KubernetesConfig *KubernetesConfig
+	JobApiConfig     *JobApiConfig
 }
 
 var JobnetesConfig *_JobnetesConfig
@@ -28,5 +29,6 @@ func InitConfig() {
 		DbConfig:         LoadDbConfig(),
 		LogConfig:        LoadLogConfig(),
 		KubernetesConfig: LoadKubernetesConfig(),
+		JobApiConfig:     LoadJobApiConfig(),
 	}
 }

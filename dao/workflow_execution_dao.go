@@ -7,6 +7,7 @@ import (
 
 type WorkflowExecutionDao interface {
 	FindById(uint, *gorm.DB) *model.WorkflowExecution
+	Create(*model.WorkflowExecution, *gorm.DB) error
 	Update(*model.WorkflowExecution, *gorm.DB)
 	FindUncompletedWorkflowExecs(*gorm.DB) []*model.WorkflowExecution
 }
@@ -17,6 +18,16 @@ func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) FindById(id uint, db *
 	execution := &model.WorkflowExecution{}
 	db.Where("id = ?", id).First(execution)
 	return execution
+}
+
+func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) Create(execution *model.WorkflowExecution, db *gorm.DB) error {
+	if execution.Input == "" {
+		execution.Input = "{}"
+	}
+	if execution.Output == "" {
+		execution.Output = "{}"
+	}
+	return db.Create(execution).Error
 }
 
 func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) Update(execution *model.WorkflowExecution, db *gorm.DB) {

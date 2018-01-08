@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: jobnetes-api-server
+spec:
+  ports:
+    - port: 50051
+  selector:
+    app: jobnetes-api-server
+---
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: jobnetes-api-server
+spec:
+  selector:
+    matchLabels:
+      app: jobnetes-api-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jobnetes-api-server
+    spec:
+      containers:
+      - name: jobnetes-api-server
+        image: attsun/jobnetes-api-server:latest
+        ports:
+        - containerPort: 50051

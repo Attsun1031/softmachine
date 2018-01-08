@@ -4,14 +4,24 @@ package jobapi;
 
 service Jobapi {
     rpc StartWorkflow (WorkflowStartRequest) returns (WorkflowStartResponse);
+    rpc RecordTaskOutput (TaskOutputRecordRequest) returns (TaskOutputRecordResponse);
 }
 
 message WorkflowStartRequest {
-    int64 workflow_id = 1;
+    uint64 workflow_id = 1;
     string exec_name = 2;
     bytes input = 3;
 }
 
 message WorkflowStartResponse {
-    int64 id = 1;
+    uint64 id = 1;
+}
+
+message TaskOutputRecordRequest {
+    uint64 task_id = 1;
+    bytes data = 2;
+}
+
+message TaskOutputRecordResponse {
+    uint64 task_id = 1;
 }

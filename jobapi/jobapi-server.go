@@ -5,6 +5,7 @@ import (
 
 	"fmt"
 
+	"github.com/Attsun1031/jobnetes/di"
 	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi"
 	"github.com/Attsun1031/jobnetes/jobapi/server/apiserver"
 	"github.com/Attsun1031/jobnetes/jobapi/server/interceptor"
@@ -25,10 +26,18 @@ func main() {
 	s := grpc.NewServer(
 		grpc.UnaryInterceptor(interceptor.UnaryInterceptor),
 	)
-	jobapi_pb.RegisterJobapiServer(s, apiserver.MakeJobApiServer())
+	jobapi_pb.RegisterJobapiServer(s, makeJobApiServer())
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 	if err := s.Serve(lis); err != nil {
 		log.Logger.Fatalf("failed to serve: %v", err)
+	}
+}
+
+func makeJobApiServer() jobapi_pb.JobapiServer {
+	return &apiserver.JobApiServerImpl{
+		WorkflowDao:          di.InjectWorkflowDao(),
+		WorkflowExecutionDao: di.InjectWorkflowExecutionDao(),
+		TaskExecutionDao:     di.InjectTaskExecutionDao(),
 	}
 }

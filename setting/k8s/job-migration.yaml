@@ -1,0 +1,12 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jobnetes-migration
+spec:
+  template:
+    spec:
+      containers:
+      - name: pi
+        image: attsun/jobnetes-migration:latest
+      restartPolicy: Never
+  backoffLimit: 1

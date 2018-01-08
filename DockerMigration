@@ -1,0 +1,5 @@
+FROM golang:1.9.2-alpine3.7
+RUN mkdir /etc/jobnetes
+COPY setting/config-example.yaml /etc/jobnetes/config.yaml
+COPY cmd/dbmigration/dbmigration /usr/local/bin
+CMD ["/usr/local/bin/dbmigration"]

@@ -2,13 +2,11 @@ log:
   level: info
 db:
   user: root
-  password: ""
-  host: "127.0.0.1"
-  port: 3333
+  password: password
+  host: mysql
+  port: 3306
 k8s:
-  in-cluster: false
-  config-path: /Users/tatsuya.atsumi/go/jobnetes/src/github.com/Attsun1031/jobnetes/cmd/example/config
-  master-url: "https://192.168.99.100:8443"
+  in-cluster: true
   job-namespace: default
 jobapi:
   port: 50051

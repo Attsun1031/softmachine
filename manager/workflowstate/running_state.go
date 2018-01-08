@@ -25,7 +25,10 @@ type RunningStateProcessor struct {
 // TODO: retry failed workflow
 func (processor *RunningStateProcessor) ToNextState(execution *model.WorkflowExecution, db *gorm.DB) (bool, error) {
 	// check current running task
-	succeededTasks := checkRunningTask(processor, execution, db)
+	succeededTasks, err := checkRunningTask(processor, execution, db)
+	if err != nil {
+		return false, err
+	}
 
 	// start next task
 	runNextTask, err := runNextTask(processor, execution, succeededTasks, db)
@@ -38,19 +41,28 @@ func (processor *RunningStateProcessor) ToNextState(execution *model.WorkflowExe
 	}
 
 	// if all task not completed, return false
-	uncompletedTasks := processor.TaskExecutionDao.FindUncompletedByWorkflowId(execution.ID, db)
+	uncompletedTasks, err := processor.TaskExecutionDao.FindUncompletedByWorkflowId(execution.ID, db)
+	if err != nil {
+		return false, err
+	}
 	if len(uncompletedTasks) > 0 {
 		return false, nil
 	}
 
 	// if all task completed, end workflow
-	endWorkflow(execution, processor, db)
+	err = endWorkflow(execution, processor, db)
+	if err != nil {
+		return false, err
+	}
 	return true, nil
 }
 
-func checkRunningTask(processor *RunningStateProcessor, execution *model.WorkflowExecution, db *gorm.DB) []*model.TaskExecution {
+func checkRunningTask(processor *RunningStateProcessor, execution *model.WorkflowExecution, db *gorm.DB) ([]*model.TaskExecution, error) {
 	// load tasks
-	tes := processor.TaskExecutionDao.FindUncompletedByWorkflowId(execution.ID, db)
+	tes, err := processor.TaskExecutionDao.FindUncompletedByWorkflowId(execution.ID, db)
+	if err != nil {
+		return nil, err
+	}
 	succeededTasks := make([]*model.TaskExecution, 0)
 	for _, te := range tes {
 		changed, err := te.Poll(processor.KubeClient)
@@ -59,13 +71,17 @@ func checkRunningTask(processor *RunningStateProcessor, execution *model.Workflo
 			continue
 		}
 		if changed {
+			err = processor.TaskExecutionDao.Update(te, db)
+			if err != nil {
+				log.Logger.Error(err)
+				continue
+			}
 			if te.Status == model.TaskSuccess {
 				succeededTasks = append(succeededTasks, te)
 			}
-			processor.TaskExecutionDao.Update(te, db)
 		}
 	}
-	return succeededTasks
+	return succeededTasks, nil
 }
 
 func runNextTask(processor *RunningStateProcessor, execution *model.WorkflowExecution, succeededTasks []*model.TaskExecution, db *gorm.DB) (bool, error) {
@@ -92,8 +108,12 @@ func runNextTask(processor *RunningStateProcessor, execution *model.WorkflowExec
 	return runNextTask, nil
 }
 
-func endWorkflow(execution *model.WorkflowExecution, processor *RunningStateProcessor, db *gorm.DB) {
-	completedTasks := processor.TaskExecutionDao.FindCompletedByWorkflowId(execution.ID, db)
+func endWorkflow(execution *model.WorkflowExecution, processor *RunningStateProcessor, db *gorm.DB) error {
+	completedTasks, err := processor.TaskExecutionDao.FindCompletedByWorkflowId(execution.ID, db)
+	if err != nil {
+		return err
+	}
+
 	hasFailedTask := false
 
 	// failed task exists?
@@ -111,5 +131,5 @@ func endWorkflow(execution *model.WorkflowExecution, processor *RunningStateProc
 	} else {
 		execution.Status = model.WfSuccess
 	}
-	processor.WorkflowExecutionDao.Update(execution, db)
+	return processor.WorkflowExecutionDao.Update(execution, db)
 }

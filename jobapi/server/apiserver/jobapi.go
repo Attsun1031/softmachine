@@ -30,7 +30,12 @@ func connect() *gorm.DB {
 func (s *server) StartWorkflow(ctx context.Context, request *jobapi_pb.WorkflowStartRequest) (*jobapi_pb.WorkflowStartResponse, error) {
 	conn := connect()
 	wfId := uint(request.GetWorkflowId())
-	wf := s.WorkflowDao.FindById(wfId, conn)
+	wf, err := s.WorkflowDao.FindById(wfId, conn)
+	if err != nil {
+		msg := fmt.Sprintf("Failed to load workflow by db error. err=%v", err)
+		return nil, status.Errorf(codes.Unknown, msg)
+	}
+
 	in := string(request.GetInput())
 	exec := &model.WorkflowExecution{
 		WorkflowID: wfId,
@@ -38,7 +43,7 @@ func (s *server) StartWorkflow(ctx context.Context, request *jobapi_pb.WorkflowS
 		Definition: wf.Definition,
 		Input:      in,
 	}
-	err := s.WorkflowExecutionDao.Create(exec, conn)
+	err = s.WorkflowExecutionDao.Create(exec, conn)
 	if err != nil {
 		msg := fmt.Sprintf("Failed to create workflow execution. req=%v err=%v", request, err)
 		return nil, status.Errorf(codes.InvalidArgument, msg)

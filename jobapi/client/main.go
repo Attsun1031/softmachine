@@ -38,8 +38,8 @@ func main() {
 	md := metadata.Pairs("username", "jobnetesadmin", "password", "test")
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 	r, err := c.StartWorkflow(ctx, &jobapi_pb.WorkflowStartRequest{
-		WorkflowId: 1,
-		ExecName:   "test",
+		WorkflowId: 2,
+		ExecName:   "test-seq-2",
 		Input:      b,
 	})
 	if err != nil {

@@ -6,13 +6,13 @@ import (
 )
 
 type WorkflowDao interface {
-	FindById(uint, *gorm.DB) *model.Workflow
+	FindById(uint, *gorm.DB) (*model.Workflow, error)
 }
 
 type WorkflowDaoImpl struct{}
 
-func (dao *WorkflowDaoImpl) FindById(id uint, db *gorm.DB) *model.Workflow {
+func (dao *WorkflowDaoImpl) FindById(id uint, db *gorm.DB) (*model.Workflow, error) {
 	wf := &model.Workflow{}
-	db.Where("id = ?", id).First(wf)
-	return wf
+	err := db.Where("id = ?", id).First(wf).Error
+	return wf, err
 }

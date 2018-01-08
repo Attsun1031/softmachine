@@ -30,7 +30,11 @@ func (manager *WorkflowManagerMain) processWorkflowState() {
 	// Load running workflows
 	log.Logger.Info("Running workflow state manager")
 
-	uncompletedExecs := manager.WorkflowExecutionDao.FindUncompletedWorkflowExecs(manager.Db)
+	uncompletedExecs, err := manager.WorkflowExecutionDao.FindUncompletedWorkflowExecs(manager.Db)
+	if err != nil {
+		log.Logger.Fatalf("Failed to load workflow executions. err=%v", err)
+		return
+	}
 
 	for _, exec := range uncompletedExecs {
 		log.Logger.Infof("Process WorkflowExecution: id=%d", exec.ID)

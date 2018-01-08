@@ -6,36 +6,38 @@ import (
 )
 
 type TaskExecutionDao interface {
-	FindById(uint, *gorm.DB) *model.TaskExecution
-	FindCompletedByWorkflowId(uint, *gorm.DB) []*model.TaskExecution
-	FindUncompletedByWorkflowId(uint, *gorm.DB) []*model.TaskExecution
-	Update(*model.TaskExecution, *gorm.DB)
+	FindById(uint, *gorm.DB) (*model.TaskExecution, error)
+	FindCompletedByWorkflowId(uint, *gorm.DB) ([]*model.TaskExecution, error)
+	FindUncompletedByWorkflowId(uint, *gorm.DB) ([]*model.TaskExecution, error)
+	Update(*model.TaskExecution, *gorm.DB) error
 }
 
 type TaskExecutionDaoImpl struct{}
 
-func (dao *TaskExecutionDaoImpl) FindById(id uint, db *gorm.DB) *model.TaskExecution {
+func (dao *TaskExecutionDaoImpl) FindById(id uint, db *gorm.DB) (*model.TaskExecution, error) {
 	execution := &model.TaskExecution{}
-	db.Where("id = ?", id).First(execution)
-	return execution
+	err := db.Where("id = ?", id).First(execution).Error
+	return execution, err
 }
 
-func (dao *TaskExecutionDaoImpl) FindCompletedByWorkflowId(wid uint, db *gorm.DB) []*model.TaskExecution {
+func (dao *TaskExecutionDaoImpl) FindCompletedByWorkflowId(wid uint, db *gorm.DB) ([]*model.TaskExecution, error) {
 	var executions []*model.TaskExecution
-	db.
+	err := db.
 		Where("workflow_execution_id = ? AND status in (?)", wid, model.CompletedTaskStatuses).
-		Find(&executions)
-	return executions
+		Find(&executions).
+		Error
+	return executions, err
 }
 
-func (dao *TaskExecutionDaoImpl) FindUncompletedByWorkflowId(wid uint, db *gorm.DB) []*model.TaskExecution {
+func (dao *TaskExecutionDaoImpl) FindUncompletedByWorkflowId(wid uint, db *gorm.DB) ([]*model.TaskExecution, error) {
 	var executions []*model.TaskExecution
-	db.
+	err := db.
 		Where("workflow_execution_id = ? AND status in (?)", wid, model.UncompletedTaskStatuses).
-		Find(&executions)
-	return executions
+		Find(&executions).
+		Error
+	return executions, err
 }
 
-func (dao *TaskExecutionDaoImpl) Update(execution *model.TaskExecution, db *gorm.DB) {
-	db.Save(execution)
+func (dao *TaskExecutionDaoImpl) Update(execution *model.TaskExecution, db *gorm.DB) error {
+	return db.Save(execution).Error
 }

@@ -25,7 +25,10 @@ func (scheduledState *ScheduledStateProcessor) ToNextState(execution *model.Work
 	jobDef := execution.GetJobDef()
 
 	// Load latest state
-	executionCurrent := scheduledState.WorkflowExecutionDao.FindById(execution.ID, db.Set("gorm:query_option", "FOR UPDATE"))
+	executionCurrent, err := scheduledState.WorkflowExecutionDao.FindById(execution.ID, db.Set("gorm:query_option", "FOR UPDATE"))
+	if err != nil {
+		return false, err
+	}
 	if executionCurrent.Status != execution.Status {
 		log.Logger.Info("State changed by other process.")
 		return false, nil
@@ -46,7 +49,10 @@ func (scheduledState *ScheduledStateProcessor) ToNextState(execution *model.Work
 	startTime := time.Now()
 	executionCurrent.Status = model.WfRunning
 	executionCurrent.StartedAt = &startTime
-	scheduledState.WorkflowExecutionDao.Update(executionCurrent, db)
+	err = scheduledState.WorkflowExecutionDao.Update(executionCurrent, db)
+	if err != nil {
+		return false, err
+	}
 
 	return true, nil
 }

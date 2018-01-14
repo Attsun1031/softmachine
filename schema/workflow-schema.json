@@ -78,12 +78,15 @@
         },
         {
           "properties": {
-            "tasks": {
-              "$ref": "#/definitions/all-tasks"
+            "task-sets": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/all-tasks"
+              }
             }
           },
           "required": [
-            "tasks"
+            "task-sets"
           ]
         }
       ]

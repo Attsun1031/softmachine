@@ -5,7 +5,6 @@ import (
 
 	"github.com/Attsun1031/jobnetes/dao"
 	"github.com/Attsun1031/jobnetes/manager/workflowstate"
-	"github.com/Attsun1031/jobnetes/model"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"github.com/jinzhu/gorm"
 )
@@ -64,27 +63,4 @@ func (manager *WorkflowManagerMain) processWorkflowState() {
 			log.Logger.Errorf("Failed to change state. id=%d cause='%s'", exec.ID, err)
 		}
 	}
-}
-
-func loadData(db *gorm.DB) {
-	user := &model.User{
-		Name: "jon",
-	}
-	db.Create(user)
-
-	workflow := &model.Workflow{
-		Name:       "sample",
-		Definition: `{"x":"hoge"}`,
-		User:       user,
-	}
-	db.Create(workflow)
-
-	exec := &model.WorkflowExecution{
-		Workflow: workflow,
-		Name:     "exec1",
-		Status:   model.WfScheduled,
-		Input:    "{}",
-		Output:   "{}",
-	}
-	db.Create(&exec)
 }

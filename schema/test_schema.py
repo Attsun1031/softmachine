@@ -60,17 +60,27 @@ class TestWorkflowSchema:
                     "name": "para1",
                     "type": "parallel",
                     "next": "task4",
-                    "tasks": [
-                        {
-                            "name": "task2",
-                            "type": "kube-job",
-                            "job": {"x": 2},
-                        },
-                        {
-                            "name": "task3",
-                            "type": "kube-job",
-                            "job": {"x": 3},
-                        }
+                    "task-sets": [
+                        [
+                            {
+                                "name": "task2",
+                                "next": "task2-2",
+                                "type": "kube-job",
+                                "job": {"x": 2},
+                            },
+                            {
+                                "name": "task2-2",
+                                "type": "kube-job",
+                                "job": {"x": 3},
+                            }
+                        ],
+                        [
+                            {
+                                "name": "task3",
+                                "type": "kube-job",
+                                "job": {"x": 3},
+                            }
+                        ]
                     ]
                 },
                 {

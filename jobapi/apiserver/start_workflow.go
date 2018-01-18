@@ -3,7 +3,7 @@ package apiserver
 import (
 	"fmt"
 
-	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi"
+	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi/proto"
 	"github.com/Attsun1031/jobnetes/model"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"golang.org/x/net/context"

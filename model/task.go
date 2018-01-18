@@ -1,6 +1,8 @@
 package model
 
-import "k8s.io/api/batch/v1"
+import (
+	"k8s.io/api/batch/v1"
+)
 
 type Task interface {
 	GetName() string
@@ -23,5 +25,27 @@ func (task *KubeJobTask) GetNextTaskName() string {
 }
 
 func (task *KubeJobTask) GetJobType() string {
-	return "kubejob"
+	return JobTypeKube
+}
+
+type ParallelTask struct {
+	Name         string
+	NextTaskName string
+	TaskSets     [][]Task
+}
+
+func (task *ParallelTask) GetName() string {
+	return task.Name
+}
+
+func (task *ParallelTask) GetNextTaskName() string {
+	return task.NextTaskName
+}
+
+func (task *ParallelTask) GetTaskSets() [][]Task {
+	return task.TaskSets
+}
+
+func (task *ParallelTask) GetJobType() string {
+	return JobTypeParallel
 }

@@ -8,6 +8,10 @@ import (
 	"k8s.io/api/batch/v1"
 )
 
+const JobTypeKube = "kube-job"
+const JobTypeParallel = "parallel-job"
+const JobTypeChoice = "choice-job"
+
 type JobDefProvider interface {
 	GetJobDef() *JobDef
 }
@@ -19,16 +23,20 @@ func GetJobDefFromString(jobDefStr string) *JobDef {
 	if err != nil {
 		log.Logger.Fatal(err)
 	}
-	jobDef := &JobDef{}
+	tasks := decodeTasks(rawJobDef.Tasks)
+	return &JobDef{Tasks: tasks}
+}
 
-	tasks := make([]Task, len(rawJobDef.Tasks))
-	for i, t := range rawJobDef.Tasks {
+func decodeTasks(rawTasks []interface{}) []Task {
+	tasks := make([]Task, len(rawTasks))
+	for i, t := range rawTasks {
+		var err error
 		decoded := t.(map[string]interface{})
 		tp := decoded["type"].(string)
 		name := decoded["name"].(string)
 		next := decoded["next"]
 		switch tp {
-		case "kube-job":
+		case JobTypeKube:
 			var b []byte
 			b, err = json.Marshal(decoded["job"])
 			if err != nil {
@@ -44,16 +52,24 @@ func GetJobDefFromString(jobDefStr string) *JobDef {
 				kjt.NextTaskName = next.(string)
 			}
 			tasks[i] = kjt
-		case "parallel":
-			log.Logger.Warn("TO BE IMPLEMENTED")
-		case "choice":
+		case JobTypeParallel:
+			pt := &ParallelTask{Name: name}
+			if next != nil {
+				pt.NextTaskName = next.(string)
+			}
+			taskSets := decoded["task-sets"].([]interface{})
+			pt.TaskSets = make([][]Task, len(taskSets))
+			for i, tasksInSet := range taskSets {
+				pt.TaskSets[i] = decodeTasks(tasksInSet.([]interface{}))
+			}
+			tasks[i] = pt
+		case JobTypeChoice:
 			log.Logger.Warn("TO BE IMPLEMENTED")
 		default:
 			log.Logger.Error(fmt.Sprintf("Unknown job type %s", tp))
 		}
 	}
-	jobDef.Tasks = tasks
-	return jobDef
+	return tasks
 }
 
 type _RawJobDef struct {
@@ -70,25 +86,39 @@ func (jobDef *JobDef) GetStartTask() Task {
 	return jobDef.Tasks[0]
 }
 
+// Get te's task definition
+func (jobDef *JobDef) GetCurrentTask(te *TaskExecution) Task {
+	return filterTasks(jobDef.Tasks, te.TaskName)
+}
+
 // Get next job
 // Next job is decided by tasks' status which belong to the execution
 func (jobDef *JobDef) GetNextTask(te *TaskExecution) Task {
-	next := ""
-	for _, t := range jobDef.Tasks {
-		if t.GetName() == te.TaskName {
-			next = t.GetNextTaskName()
-			break
-		}
-	}
-	if next == "" {
+	current := jobDef.GetCurrentTask(te)
+	nextName := current.GetNextTaskName()
+	if nextName == "" {
 		return nil
 	}
+	nextTask := filterTasks(jobDef.Tasks, nextName)
+	if nextTask == nil {
+		log.Logger.Fatalf("Next task %v not found in job definition.", nextName)
+	}
+	return nextTask
+}
 
-	for _, t := range jobDef.Tasks {
-		if t.GetName() == next {
+func filterTasks(tasks []Task, taskName string) Task {
+	for _, t := range tasks {
+		if t.GetName() == taskName {
 			return t
 		}
+		if t.GetJobType() == JobTypeParallel {
+			for _, ts := range t.(*ParallelTask).TaskSets {
+				it := filterTasks(ts, taskName)
+				if it != nil {
+					return it
+				}
+			}
+		}
 	}
-	log.Logger.Fatal(fmt.Sprintf("Next task %s not found in job definition.", next))
 	return nil
 }

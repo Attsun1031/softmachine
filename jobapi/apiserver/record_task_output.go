@@ -3,7 +3,7 @@ package apiserver
 import (
 	"fmt"
 
-	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi"
+	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"

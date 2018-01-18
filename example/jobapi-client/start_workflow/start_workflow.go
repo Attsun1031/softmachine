@@ -7,7 +7,7 @@ import (
 
 	"fmt"
 
-	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi"
+	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"

@@ -9,6 +9,7 @@ import (
 
 	"github.com/Attsun1031/jobnetes/dao"
 	"github.com/Attsun1031/jobnetes/manager/taskexecutor"
+	"github.com/Attsun1031/jobnetes/manager/taskpoller"
 	"github.com/Attsun1031/jobnetes/model"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"github.com/jinzhu/gorm"
@@ -19,6 +20,7 @@ type RunningStateProcessor struct {
 	WorkflowExecutionDao dao.WorkflowExecutionDao
 	TaskExecutionDao     dao.TaskExecutionDao
 	TaskExecutorFactory  taskexecutor.Factory
+	TaskPollerFactory    taskpoller.Factory
 	KubeClient           kubernetes.Interface
 }
 
@@ -63,20 +65,21 @@ func checkRunningTask(processor *RunningStateProcessor, execution *model.Workflo
 	if err != nil {
 		return nil, err
 	}
+	jobDef := execution.GetJobDef()
 	succeededTasks := make([]*model.TaskExecution, 0)
 	for _, te := range tes {
-		changed, err := te.Poll(processor.KubeClient)
+		poller, err := processor.TaskPollerFactory.GetTaskPoller(te, jobDef)
+		if err != nil {
+			log.Logger.Error(err)
+			continue
+		}
+		changed, err := poller.Poll(te, db)
 		if err != nil {
 			log.Logger.Error(err)
 			continue
 		}
 		if changed {
-			err = processor.TaskExecutionDao.Update(te, db)
-			if err != nil {
-				log.Logger.Error(err)
-				continue
-			}
-			if te.Status == model.TaskSuccess {
+			if te.IsSucceeded() {
 				succeededTasks = append(succeededTasks, te)
 			}
 		}
@@ -91,16 +94,17 @@ func runNextTask(processor *RunningStateProcessor, execution *model.WorkflowExec
 	for _, te := range succeededTasks {
 		next := jobDef.GetNextTask(te)
 		if next == nil {
+			log.Logger.Infof("No next task. TaskID=%v", te.ID)
 			continue
 		}
 		runNextTask = true
 
-		log.Logger.Infof("Run next task. current-exec-name=%s next-name=%s", te.ExecutionName, next.GetName())
+		log.Logger.Infof("Run next task. CurrentTaskID=%v NextTaskName=%v", te.ID, next.GetName())
 		executor, err := processor.TaskExecutorFactory.GetTaskExecutor(next)
 		if err != nil {
 			return runNextTask, err
 		}
-		err = executor.Execute(execution, db, te.Output)
+		err = executor.Execute(execution, db, te.Output, te.ParentTaskExecutionID)
 		if err != nil {
 			return runNextTask, errors.New(fmt.Sprintf("Failed to request task. ExecutionName=%s cause=%s", next.GetName(), err))
 		}
@@ -118,7 +122,7 @@ func endWorkflow(execution *model.WorkflowExecution, processor *RunningStateProc
 
 	// failed task exists?
 	for _, te := range completedTasks {
-		if te.Status == model.TaskFailed {
+		if te.IsFailed() {
 			hasFailedTask = true
 			break
 		}

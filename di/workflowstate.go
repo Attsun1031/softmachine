@@ -9,6 +9,7 @@ func InjectWorkflowExecutionStateProcessorFactory(kubeClient kubernetes.Interfac
 	workflowExecutionDao := InjectWorkflowExecutionDao()
 	taskExecutionDao := InjectTaskExecutionDao()
 	taskExecutorFactory := InjectTaskExecutorFactory(kubeClient)
+	taskPollerFactory := InjectTaskPollerFactory(kubeClient)
 	return &workflowstate.RegistryImpl{
 		ScheduleState: &workflowstate.ScheduledStateProcessor{
 			WorkflowExecutionDao: workflowExecutionDao,
@@ -18,6 +19,7 @@ func InjectWorkflowExecutionStateProcessorFactory(kubeClient kubernetes.Interfac
 			WorkflowExecutionDao: workflowExecutionDao,
 			TaskExecutionDao:     taskExecutionDao,
 			TaskExecutorFactory:  taskExecutorFactory,
+			TaskPollerFactory:    taskPollerFactory,
 			KubeClient:           kubeClient,
 		},
 	}

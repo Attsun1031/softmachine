@@ -28,6 +28,12 @@ func (factory *FactoryImpl) GetTaskExecutor(task model.Task) (TaskExecutor, erro
 			TaskExecutionDao: factory.TaskExecutionDao,
 			KubeClient:       factory.KubeClient,
 		}, nil
+	case *model.ParallelTask:
+		return &ParallelJobTaskExecutor{
+			Task:                task.(*model.ParallelTask),
+			TaskExecutionDao:    factory.TaskExecutionDao,
+			TaskExecutorFactory: factory,
+		}, nil
 	default:
 		return nil, errors.New(fmt.Sprintf("Unknown task type %s", reflect.TypeOf(task)))
 	}

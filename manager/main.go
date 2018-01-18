@@ -36,22 +36,36 @@ func (manager *WorkflowManagerMain) processWorkflowState() {
 	}
 
 	for _, exec := range uncompletedExecs {
-		log.Logger.Infof("Process WorkflowExecution: id=%d", exec.ID)
+		log.Logger.Infof("Process WorkflowExecution: id=%v", exec.ID)
 
 		// get state object
 		prevState := exec.Status
 
 		stateProcessor, err := manager.WorkflowExecutionProcessorRegistry.GetProcessor(exec)
 		if err != nil {
-			log.Logger.Error("Failed to get Workflow Execution processor. id=%d cause=%s", exec.ID, err)
+			log.Logger.Errorf("Failed to get Workflow Execution processor. id=%v cause=%v", exec.ID, err)
 			continue
 		}
 
+		// ensure a WorkflowExecution record is handled only by this thread.
+		// (as a result, TaskExecutions related to the WorkflowExecution are handled only by this.)
 		tx := manager.Db.Begin()
-		stateChanged, err := stateProcessor.ToNextState(exec, tx)
+		execCurrent, err := manager.WorkflowExecutionDao.FindById(exec.ID, tx.Set("gorm:query_option", "FOR UPDATE"))
+		if err != nil {
+			log.Logger.Errorf("Failed to fetch and lock target workflow execution record. id=%v cause=%v", exec.ID, err)
+			tx.Rollback()
+			continue
+		}
+		if execCurrent.Status != exec.Status {
+			log.Logger.Info("State changed by other process.")
+			tx.Rollback()
+			continue
+		}
+
+		stateChanged, err := stateProcessor.ToNextState(execCurrent, tx)
 		if err != nil {
 			tx.Rollback()
-			log.Logger.Errorf("Failed to change state for wid=%d cause=%s", exec.ID, err)
+			log.Logger.Errorf("Failed to change state for wid=%v cause=%v", exec.ID, err)
 			continue
 		}
 		tx.Commit()

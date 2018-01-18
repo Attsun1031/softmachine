@@ -7,21 +7,19 @@ import (
 
 	"github.com/Attsun1031/jobnetes/dao"
 	"github.com/Attsun1031/jobnetes/model"
-	"github.com/Attsun1031/jobnetes/utils/config"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"github.com/jinzhu/gorm"
-	"k8s.io/client-go/kubernetes"
 )
 
-type KubeJobTaskExecutor struct {
-	Task             *model.KubeJobTask
-	TaskExecutionDao dao.TaskExecutionDao
-	KubeClient       kubernetes.Interface
+type ParallelJobTaskExecutor struct {
+	Task                *model.ParallelTask
+	TaskExecutionDao    dao.TaskExecutionDao
+	TaskExecutorFactory Factory
 }
 
-func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB, input string, parentID uint) error {
+func (executor *ParallelJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB, input string, parentID uint) error {
 	task := executor.Task
-	log.Logger.Infof("Requesting k8s task. ExecutionName=%s Type=%s ParentID=%v", task.Name, task.GetJobType(), parentID)
+	log.Logger.Infof("Requesting parallel task. ExecutionName=%s Type=%s ParentID", task.Name, task.GetJobType(), parentID)
 
 	// create execution record
 	startedAt := time.Now()
@@ -51,12 +49,24 @@ func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *go
 		return err
 	}
 
-	// start kubernetes job
-	spec := task.KubeJobSpec
-	spec.Name = name
-	_, err = executor.KubeClient.
-		BatchV1().
-		Jobs(config.JobnetesConfig.KubernetesConfig.JobNamespace).
-		Create(&spec)
-	return err
+	executors := make([]TaskExecutor, len(task.TaskSets))
+	for _, taskSet := range task.TaskSets {
+		startTask := taskSet[0]
+		executor, err := executor.TaskExecutorFactory.GetTaskExecutor(startTask)
+		if err != nil {
+			return err
+		}
+		executors = append(executors, executor)
+	}
+
+	for _, executor := range executors {
+		if executor == nil {
+			continue
+		}
+		err = executor.Execute(we, db, input, te.ID)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }

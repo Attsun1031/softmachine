@@ -9,6 +9,7 @@ type TaskExecutionDao interface {
 	FindById(uint, *gorm.DB) (*model.TaskExecution, error)
 	FindCompletedByWorkflowId(uint, *gorm.DB) ([]*model.TaskExecution, error)
 	FindUncompletedByWorkflowId(uint, *gorm.DB) ([]*model.TaskExecution, error)
+	FindChildTasks(uint, *gorm.DB) ([]*model.TaskExecution, error)
 	Update(*model.TaskExecution, *gorm.DB) error
 }
 
@@ -33,6 +34,15 @@ func (dao *TaskExecutionDaoImpl) FindUncompletedByWorkflowId(wid uint, db *gorm.
 	var executions []*model.TaskExecution
 	err := db.
 		Where("workflow_execution_id = ? AND status in (?)", wid, model.UncompletedTaskStatuses).
+		Find(&executions).
+		Error
+	return executions, err
+}
+
+func (dao *TaskExecutionDaoImpl) FindChildTasks(parentTaskId uint, db *gorm.DB) ([]*model.TaskExecution, error) {
+	var executions []*model.TaskExecution
+	err := db.
+		Where("parent_task_execution_id = ?", parentTaskId).
 		Find(&executions).
 		Error
 	return executions, err

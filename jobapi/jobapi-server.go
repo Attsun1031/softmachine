@@ -6,9 +6,9 @@ import (
 	"fmt"
 
 	"github.com/Attsun1031/jobnetes/di"
-	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi"
-	"github.com/Attsun1031/jobnetes/jobapi/server/apiserver"
-	"github.com/Attsun1031/jobnetes/jobapi/server/interceptor"
+	"github.com/Attsun1031/jobnetes/jobapi/apiserver"
+	"github.com/Attsun1031/jobnetes/jobapi/interceptor"
+	jobapi_pb "github.com/Attsun1031/jobnetes/jobapi/proto"
 	"github.com/Attsun1031/jobnetes/utils/config"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"google.golang.org/grpc"
@@ -29,6 +29,7 @@ func main() {
 	jobapi_pb.RegisterJobapiServer(s, makeJobApiServer())
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
+	log.Logger.Infof("Start jobapi server. port: %v", config.JobnetesConfig.JobApiConfig.Port)
 	if err := s.Serve(lis); err != nil {
 		log.Logger.Fatalf("failed to serve: %v", err)
 	}

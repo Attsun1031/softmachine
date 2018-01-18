@@ -13,7 +13,7 @@ It has these top-level messages:
 	TaskOutputRecordRequest
 	TaskOutputRecordResponse
 */
-package jobapi
+package proto
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"

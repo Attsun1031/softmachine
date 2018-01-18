@@ -13,5 +13,6 @@ func Run() {
 	d := db.Connect(config.JobnetesConfig.DbConfig)
 	// TODO: foreign key
 	// https://github.com/jinzhu/gorm/issues/450
+	d.Exec("CREATE DATABASE IF NOT EXISTS jobnetes;")
 	d.AutoMigrate(&model.User{}, &model.Workflow{}, &model.WorkflowExecution{}, &model.TaskExecution{})
 }

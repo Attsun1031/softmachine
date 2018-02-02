@@ -12,3 +12,7 @@ jobapi:
   port: 50051
   username: jobnetesadmin
   password: test
+webadmin:
+  port: 8080
+  username: jobnetesadmin
+  password: test

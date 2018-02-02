@@ -11,6 +11,7 @@ type _JobnetesConfig struct {
 	LogConfig        *LogConfig
 	KubernetesConfig *KubernetesConfig
 	JobApiConfig     *JobApiConfig
+	WebAdminConfig   *WebAdminConfig
 }
 
 var JobnetesConfig *_JobnetesConfig
@@ -30,5 +31,6 @@ func InitConfig() {
 		LogConfig:        LoadLogConfig(),
 		KubernetesConfig: LoadKubernetesConfig(),
 		JobApiConfig:     LoadJobApiConfig(),
+		WebAdminConfig:   LoadWebAdminConfig(),
 	}
 }

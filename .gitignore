@@ -20,3 +20,4 @@ vendor/
 
 # webadmin
 webadmin/node_modules
+webadmin/*.log

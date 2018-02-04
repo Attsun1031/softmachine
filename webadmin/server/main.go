@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/Attsun1031/jobnetes/dao/db"
+	"github.com/Attsun1031/jobnetes/di"
 	"github.com/Attsun1031/jobnetes/utils/config"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"github.com/Attsun1031/jobnetes/webadmin/server/api"
@@ -15,9 +15,6 @@ func main() {
 	// Setup application config
 	config.InitConfig()
 	log.SetupLogger(config.JobnetesConfig.LogConfig)
-	d := db.Connect(config.JobnetesConfig.DbConfig)
-	defer d.Close()
-	d.SetLogger(log.Logger)
 	webAdminConfig := config.JobnetesConfig.WebAdminConfig
 
 	// Disable Console Color
@@ -34,12 +31,10 @@ func main() {
 	apiV1 := router.Group("/api/v1")
 	{
 		apiV1.GET("/workflow", api.WorkflowApi)
-		apiV1.GET("/workflow/exec", func(c *gin.Context) {
-			log.Logger.Info("workflow executions")
-		})
-		apiV1.GET("/task", func(c *gin.Context) {
-			log.Logger.Info("tasks")
-		})
+		apiV1.GET("/workflow/execution", (&api.WorkflowExecutionApi{
+			WorkflowDao:          di.InjectWorkflowDao(),
+			WorkflowExecutionDao: di.InjectWorkflowExecutionDao(),
+		}).Get)
 	}
 
 	// By default it serves on :8080 unless a PORT environment variable was defined.

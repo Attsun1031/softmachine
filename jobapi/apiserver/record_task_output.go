@@ -11,6 +11,8 @@ import (
 
 func (s *JobApiServerImpl) RecordTaskOutput(ctx context.Context, request *jobapi_pb.TaskOutputRecordRequest) (*jobapi_pb.TaskOutputRecordResponse, error) {
 	conn := s.connect()
+	defer conn.Close()
+
 	tx := conn.Begin()
 	defer func() {
 		if err := recover(); err != nil {

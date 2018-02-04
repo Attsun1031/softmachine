@@ -10,7 +10,8 @@ import (
 func Run() {
 	config.InitConfig()
 	log.SetupLogger(config.JobnetesConfig.LogConfig)
-	d := db.Connect(config.JobnetesConfig.DbConfig)
+	d := db.Connect(config.JobnetesConfig.DbConfig, log.Logger)
+	defer d.Close()
 	// TODO: foreign key
 	// https://github.com/jinzhu/gorm/issues/450
 	d.Exec("CREATE DATABASE IF NOT EXISTS jobnetes;")

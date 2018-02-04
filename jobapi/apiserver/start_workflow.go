@@ -13,6 +13,8 @@ import (
 
 func (s *JobApiServerImpl) StartWorkflow(ctx context.Context, request *jobapi_pb.WorkflowStartRequest) (*jobapi_pb.WorkflowStartResponse, error) {
 	conn := s.connect()
+	defer conn.Close()
+
 	wfId := uint(request.GetWorkflowId())
 	wf, err := s.WorkflowDao.FindById(wfId, conn)
 	if err != nil {

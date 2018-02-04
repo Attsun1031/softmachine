@@ -15,7 +15,6 @@ type JobApiServerImpl struct {
 }
 
 func (s *JobApiServerImpl) connect() *gorm.DB {
-	d := db.Connect(config.JobnetesConfig.DbConfig)
-	d.SetLogger(log.Logger)
+	d := db.Connect(config.JobnetesConfig.DbConfig, log.Logger)
 	return d
 }

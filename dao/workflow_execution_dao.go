@@ -7,6 +7,7 @@ import (
 
 type WorkflowExecutionDao interface {
 	FindById(uint, *gorm.DB) (*model.WorkflowExecution, error)
+	Find(limit int, offset int, order string, db *gorm.DB) ([]*model.WorkflowExecution, error)
 	Create(*model.WorkflowExecution, *gorm.DB) error
 	Update(*model.WorkflowExecution, *gorm.DB) error
 	FindUncompletedWorkflowExecs(*gorm.DB) ([]*model.WorkflowExecution, error)
@@ -18,6 +19,17 @@ func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) FindById(id uint, db *
 	execution := &model.WorkflowExecution{}
 	err := db.Where("id = ?", id).First(execution).Error
 	return execution, err
+}
+
+func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) Find(limit int, offset int, order string, db *gorm.DB) ([]*model.WorkflowExecution, error) {
+	var workflowExecutions []*model.WorkflowExecution
+	err := db.
+		Order(order).
+		Limit(limit).
+		Offset(offset).
+		Find(&workflowExecutions).
+		Error
+	return workflowExecutions, err
 }
 
 func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) Create(execution *model.WorkflowExecution, db *gorm.DB) error {

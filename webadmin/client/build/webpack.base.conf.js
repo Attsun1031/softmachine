@@ -4,8 +4,9 @@ const utils = require('./utils')
 const config = require('../config')
 const vueLoaderConfig = require('./vue-loader.conf')
 const webpack = require('webpack')
+const npmDir = path.resolve(__dirname, '../node_modules')
 
-function resolve (dir) {
+function resolve(dir) {
   return path.join(__dirname, '..', dir)
 }
 
@@ -37,14 +38,16 @@ module.exports = {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
       '@': resolve('src'),
-      'jquery': path.join(__dirname, '../node_modules', 'jquery'),
+      'jquery': path.join(npmDir, 'jquery'),
+      'es6-promise': path.join(npmDir, 'es6-promise'),
+      'whatwg-fetch': path.join(npmDir, 'whatwg-fetch')
     }
   },
   plugins: [
     new webpack.ProvidePlugin({
       $: 'jquery',
       jQuery: 'jquery',
-      'window.jQuery': 'jquery'
+      'window.jQuery': 'jquery',
     })
   ],
   module: {

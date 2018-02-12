@@ -19,6 +19,7 @@ type WorkflowExecutionApi struct {
 }
 
 type WorkflowExecutionResult struct {
+	ID            uint                     `json:"id"`
 	Status        model.WorkflowStatusType `json:"status"`
 	WorkflowName  string                   `json:"workflowName"`
 	ExecutionName string                   `json:"executionName"`
@@ -54,6 +55,7 @@ func (api *WorkflowExecutionApi) Get(c *gin.Context) {
 	for i, we := range execs {
 		workflow := idToWorkflow[we.WorkflowID]
 		results[i] = &WorkflowExecutionResult{
+			ID:            we.ID,
 			Status:        we.Status,
 			WorkflowName:  workflow.Name,
 			ExecutionName: we.Name,

@@ -24,9 +24,9 @@ func main() {
 	gin.Logger()
 	router := gin.New()
 	router.Use(middleware.Logger, gin.Recovery())
-	router.Use(gin.BasicAuth(gin.Accounts{
-		webAdminConfig.Username: webAdminConfig.Password,
-	}))
+	//router.Use(gin.BasicAuth(gin.Accounts{
+	//	webAdminConfig.Username: webAdminConfig.Password,
+	//}))
 
 	apiV1 := router.Group("/api/v1")
 	{

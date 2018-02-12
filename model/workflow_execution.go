@@ -17,20 +17,21 @@ var UncompletedWorkflowStatuses = []WorkflowStatusType{
 }
 
 type WorkflowExecution struct {
-	ID         uint `gorm:"primary_key"`
-	Workflow   *Workflow
-	WorkflowID uint   `gorm:"not null"`
-	Name       string `gorm:"not null"`
-	StartedAt  *time.Time
-	EndedAt    *time.Time
-	Status     WorkflowStatusType `gorm:"not null"`
-	Input      string             `gorm:"type:json;not null"`
-	Output     string             `gorm:"type:json;not null"`
-	Definition string             `gorm:"type:json;not null"`
-	Attempt    int                `gorm:"not null;default:1"`
-	ErrorMsg   string
-	CreatedAt  *time.Time
-	UpdatedAt  *time.Time
+	ID             uint               `gorm:"primary_key" json:"id"`
+	Workflow       *Workflow          `json:"workflow"`
+	WorkflowID     uint               `gorm:"not null" json:"-"`
+	TaskExecutions []TaskExecution    `json:"taskExecutions"`
+	Name           string             `gorm:"not null" json:"name"`
+	StartedAt      *time.Time         `json:"startedAt"`
+	EndedAt        *time.Time         `json:"endedAt"`
+	Status         WorkflowStatusType `gorm:"not null" json:"status"`
+	Input          string             `gorm:"type:json;not null" json:"input"`
+	Output         string             `gorm:"type:json;not null" json:"output"`
+	Definition     string             `gorm:"type:json;not null" json:"definition"`
+	Attempt        int                `gorm:"not null;default:1" json:"attempt"`
+	ErrorMsg       string             `json:"errorMsg"`
+	CreatedAt      *time.Time         `json:"-"`
+	UpdatedAt      *time.Time         `json:"-"`
 
 	jobDef *JobDef `gorm:"-"`
 }

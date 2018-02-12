@@ -35,6 +35,11 @@ func main() {
 			WorkflowDao:          di.InjectWorkflowDao(),
 			WorkflowExecutionDao: di.InjectWorkflowExecutionDao(),
 		}).Get)
+		apiV1.GET("/workflow/execution/:id", (&api.WorkflowExecutionDetailApi{
+			WorkflowDao:          di.InjectWorkflowDao(),
+			WorkflowExecutionDao: di.InjectWorkflowExecutionDao(),
+			TaskExecutionDao:     di.InjectTaskExecutionDao(),
+		}).Get)
 	}
 
 	// By default it serves on :8080 unless a PORT environment variable was defined.

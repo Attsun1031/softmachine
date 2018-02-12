@@ -50,7 +50,7 @@ func (manager *WorkflowManagerMain) processWorkflowState() {
 		// ensure a WorkflowExecution record is handled only by this thread.
 		// (as a result, TaskExecutions related to the WorkflowExecution are handled only by this.)
 		tx := manager.Db.Begin()
-		execCurrent, err := manager.WorkflowExecutionDao.FindById(exec.ID, tx.Set("gorm:query_option", "FOR UPDATE"))
+		execCurrent, err := manager.WorkflowExecutionDao.FindById(exec.ID, false, tx.Set("gorm:query_option", "FOR UPDATE"))
 		if err != nil {
 			log.Logger.Errorf("Failed to fetch and lock target workflow execution record. id=%v cause=%v", exec.ID, err)
 			tx.Rollback()

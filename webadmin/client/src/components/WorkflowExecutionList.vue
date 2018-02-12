@@ -16,15 +16,13 @@
         <tbody>
         <tr v-for="we in workflowExecs" :key="we.id">
           <td>{{ we.status }}</td>
-          <td>{{ we.workflowName }}</td>
-          <td>{{ we.executionName }}</td>
-          <td>{{ we.start }}</td>
-          <td>{{ we.end }}</td>
+          <td>{{ we.name }}</td>
+          <td>{{ we.workflow.name }}</td>
+          <td>{{ we.startedAt }}</td>
+          <td>{{ we.endedAt }}</td>
         </tr>
         </tbody>
       </table>
-      <button v-on:click="onClickButton">Add 1</button>
-      <div>{{ counter }}</div>
     </div>
   </div>
 </template>
@@ -37,9 +35,7 @@ export default {
   name: 'WorkflowExecutionList',
   data () {
     return {
-      workflowExecs: [],
-      counter: 0,
-      msg: 'test'
+      workflowExecs: []
     }
   },
   beforeRouteEnter (route, redirect, next) {
@@ -60,11 +56,6 @@ export default {
         this.workflowExecs = data.items
         next()
       })
-  },
-  methods: {
-    onClickButton: function (e) {
-      this.counter += 1
-    }
   }
 }
 </script>

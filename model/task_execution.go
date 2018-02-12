@@ -22,22 +22,22 @@ var CompletedTaskStatuses = []TaskStatusType{
 }
 
 type TaskExecution struct {
-	ID                    uint `gorm:"primary_key"`
-	WorkflowExecution     *WorkflowExecution
-	WorkflowExecutionID   uint `gorm:"not null"`
-	ParentTaskExecution   *TaskExecution
-	ParentTaskExecutionID uint
-	ExecutionName         string     `gorm:"not null"`
-	TaskName              string     `gorm:"not null"`
-	StartedAt             *time.Time `gorm:"not null"`
-	EndedAt               *time.Time
-	Status                TaskStatusType `gorm:"not null"`
-	Input                 string         `gorm:"type:json;not null"`
-	Output                string         `gorm:"type:json;not null"`
-	ErrorReason           string
-	ErrorMsg              string
-	CreatedAt             *time.Time
-	UpdatedAt             *time.Time
+	ID                    uint               `gorm:"primary_key" json:"id"`
+	WorkflowExecution     *WorkflowExecution `json:"-"`
+	WorkflowExecutionID   uint               `gorm:"not null" json:"-"`
+	ParentTaskExecution   *TaskExecution     `json:"-"`
+	ParentTaskExecutionID uint               `json:"parentId"`
+	ExecutionName         string             `gorm:"not null" json:"executionName"`
+	TaskName              string             `gorm:"not null" json:"taskName"`
+	StartedAt             *time.Time         `gorm:"not null" json:"startedAt"`
+	EndedAt               *time.Time         `json:"endedAt"`
+	Status                TaskStatusType     `gorm:"not null" json:"status"`
+	Input                 string             `gorm:"type:json;not null" json:"input"`
+	Output                string             `gorm:"type:json;not null" json:"output"`
+	ErrorReason           string             `json:"errorReason"`
+	ErrorMsg              string             `json:"errorMsg"`
+	CreatedAt             *time.Time         `json:"-"`
+	UpdatedAt             *time.Time         `json:"-"`
 }
 
 func (te *TaskExecution) IsCompleted() bool {

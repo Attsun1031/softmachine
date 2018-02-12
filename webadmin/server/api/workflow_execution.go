@@ -3,8 +3,6 @@ package api
 import (
 	"net/http"
 
-	"time"
-
 	"github.com/Attsun1031/jobnetes/dao"
 	"github.com/Attsun1031/jobnetes/dao/db"
 	"github.com/Attsun1031/jobnetes/model"
@@ -16,15 +14,6 @@ import (
 type WorkflowExecutionApi struct {
 	WorkflowDao          dao.WorkflowDao
 	WorkflowExecutionDao dao.WorkflowExecutionDao
-}
-
-type WorkflowExecutionResult struct {
-	ID            uint                     `json:"id"`
-	Status        model.WorkflowStatusType `json:"status"`
-	WorkflowName  string                   `json:"workflowName"`
-	ExecutionName string                   `json:"executionName"`
-	Start         time.Time                `json:"start"`
-	End           time.Time                `json:"end"`
 }
 
 func (api *WorkflowExecutionApi) Get(c *gin.Context) {
@@ -51,17 +40,8 @@ func (api *WorkflowExecutionApi) Get(c *gin.Context) {
 		idToWorkflow[w.ID] = w
 	}
 
-	results := make([]*WorkflowExecutionResult, len(execs))
-	for i, we := range execs {
-		workflow := idToWorkflow[we.WorkflowID]
-		results[i] = &WorkflowExecutionResult{
-			ID:            we.ID,
-			Status:        we.Status,
-			WorkflowName:  workflow.Name,
-			ExecutionName: we.Name,
-			Start:         *we.StartedAt,
-			End:           *we.EndedAt,
-		}
+	for _, we := range execs {
+		we.Workflow = idToWorkflow[we.WorkflowID]
 	}
-	c.JSON(http.StatusOK, gin.H{"items": results})
+	c.JSON(http.StatusOK, gin.H{"items": execs})
 }

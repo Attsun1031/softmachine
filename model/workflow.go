@@ -5,13 +5,13 @@ import (
 )
 
 type Workflow struct {
-	ID         uint   `gorm:"primary_key"`
-	Name       string `gorm:"not null"`
-	Definition string `gorm:"type:json;not null"`
-	User       *User  `gorm:"not null"`
-	UserID     uint   `gorm:"not null"`
-	CreatedAt  *time.Time
-	UpdatedAt  *time.Time
+	ID         uint       `gorm:"primary_key" json:"id"`
+	Name       string     `gorm:"not null" json:"name"`
+	Definition string     `gorm:"type:json;not null" json:"definition"`
+	User       *User      `gorm:"not null" json:"user"`
+	UserID     uint       `gorm:"not null" json:"-"`
+	CreatedAt  *time.Time `json:"-"`
+	UpdatedAt  *time.Time `json:"-"`
 
 	jobDef *JobDef `gorm:"-"`
 }

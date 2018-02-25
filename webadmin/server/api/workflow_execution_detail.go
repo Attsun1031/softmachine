@@ -30,7 +30,7 @@ func (api *WorkflowExecutionDetailApi) Get(c *gin.Context) {
 	d := db.Connect(config.JobnetesConfig.DbConfig, log.Logger)
 	defer d.Close()
 	log.Logger.Infof("workflow execution detail with id=%v", id)
-	we, err := api.WorkflowExecutionDao.FindById(id, true, d)
+	we, err := api.WorkflowExecutionDao.FindById(id, true, true, d)
 	if err != nil {
 		panic(err)
 	}

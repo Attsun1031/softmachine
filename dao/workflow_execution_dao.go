@@ -6,7 +6,7 @@ import (
 )
 
 type WorkflowExecutionDao interface {
-	FindById(uint, bool, *gorm.DB) (*model.WorkflowExecution, error)
+	FindById(uint, bool, bool, *gorm.DB) (*model.WorkflowExecution, error)
 	Find(limit int, offset int, order string, db *gorm.DB) ([]*model.WorkflowExecution, error)
 	Create(*model.WorkflowExecution, *gorm.DB) error
 	Update(*model.WorkflowExecution, *gorm.DB) error
@@ -15,13 +15,18 @@ type WorkflowExecutionDao interface {
 
 type WorkflowExecutionDaoImpl struct{}
 
-func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) FindById(id uint, withTasks bool, db *gorm.DB) (*model.WorkflowExecution, error) {
+func (workflowExecutionDaoImpl *WorkflowExecutionDaoImpl) FindById(id uint, withWorkflow bool, withTasks bool, db *gorm.DB) (*model.WorkflowExecution, error) {
 	execution := &model.WorkflowExecution{}
 	var d *gorm.DB
 	if withTasks {
 		d = db.Preload("TaskExecutions")
 	} else {
 		d = db
+	}
+	if withWorkflow {
+		d = d.Preload("Workflow")
+	} else {
+		d = d
 	}
 	err := d.Where("id = ?", id).First(execution).Error
 	return execution, err

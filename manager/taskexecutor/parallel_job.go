@@ -27,6 +27,7 @@ func (executor *ParallelJobTaskExecutor) Execute(we *model.WorkflowExecution, db
 		WorkflowExecution:     we,
 		ParentTaskExecutionID: parentID,
 		TaskName:              task.Name,
+		TaskType:              task.GetJobType(),
 		StartedAt:             &startedAt,
 		Status:                model.TaskRunning,
 		Input:                 input,

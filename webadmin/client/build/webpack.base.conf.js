@@ -40,7 +40,8 @@ module.exports = {
       '@': resolve('src'),
       'jquery': path.join(npmDir, 'jquery'),
       'es6-promise': path.join(npmDir, 'es6-promise'),
-      'whatwg-fetch': path.join(npmDir, 'whatwg-fetch')
+      'whatwg-fetch': path.join(npmDir, 'whatwg-fetch'),
+      'vis': path.join(npmDir, 'vis')
     }
   },
   plugins: [

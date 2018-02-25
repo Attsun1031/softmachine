@@ -5,6 +5,7 @@ import App from './App'
 import router from './router'
 require('materialize-css')
 require('../node_modules/materialize-css/dist/css/materialize.min.css')
+require('../node_modules/vis/dist/vis.min.css')
 require('es6-promise').polyfill()
 
 Vue.config.productionTip = false

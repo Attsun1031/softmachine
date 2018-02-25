@@ -5,6 +5,7 @@
       <table class="highlight bordered">
         <thead>
         <tr>
+          <th>ID</th>
           <th>Status</th>
           <th>Workflow Name</th>
           <th>Execution Name</th>
@@ -14,7 +15,8 @@
         </thead>
 
         <tbody>
-        <tr v-for="we in workflowExecs" :key="we.id">
+        <tr v-for="we in workflowExecs" :key="we.id" v-on:click="onClickExec(we.id)">
+          <td>{{ we.id }}</td>
           <td>{{ we.status }}</td>
           <td>{{ we.name }}</td>
           <td>{{ we.workflow.name }}</td>
@@ -56,6 +58,16 @@ export default {
         this.workflowExecs = data.items
         next()
       })
+  },
+  methods: {
+    onClickExec: function (wid) {
+      this.$router.push({
+        name: 'WorkflowExecutionDetail',
+        params: {
+          id: wid
+        }
+      })
+    }
   }
 }
 </script>

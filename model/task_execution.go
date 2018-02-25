@@ -29,6 +29,7 @@ type TaskExecution struct {
 	ParentTaskExecutionID uint               `json:"parentId"`
 	ExecutionName         string             `gorm:"not null" json:"executionName"`
 	TaskName              string             `gorm:"not null" json:"taskName"`
+	TaskType              string             `gorm:"not null" json:"taskType"`
 	StartedAt             *time.Time         `gorm:"not null" json:"startedAt"`
 	EndedAt               *time.Time         `json:"endedAt"`
 	Status                TaskStatusType     `gorm:"not null" json:"status"`

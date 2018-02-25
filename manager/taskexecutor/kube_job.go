@@ -29,6 +29,7 @@ func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *go
 		WorkflowExecution:     we,
 		ParentTaskExecutionID: parentID,
 		TaskName:              task.Name,
+		TaskType:              task.GetJobType(),
 		StartedAt:             &startedAt,
 		Status:                model.TaskRunning,
 		Input:                 input,

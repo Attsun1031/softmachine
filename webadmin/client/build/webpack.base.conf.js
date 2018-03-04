@@ -41,7 +41,8 @@ module.exports = {
       'jquery': path.join(npmDir, 'jquery'),
       'es6-promise': path.join(npmDir, 'es6-promise'),
       'whatwg-fetch': path.join(npmDir, 'whatwg-fetch'),
-      'vis': path.join(npmDir, 'vis')
+      'd3': path.join(npmDir, 'dagre-d3', 'node_modules', 'd3', 'build', 'd3.min.js'),
+      'dagreD3': path.join(npmDir, 'dagre-d3')
     }
   },
   plugins: [

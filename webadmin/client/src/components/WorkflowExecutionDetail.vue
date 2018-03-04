@@ -1,10 +1,3 @@
-<style scoped>
-  #mynetwork {
-    width: 600px;
-    height: 400px;
-    border: 1px solid lightgray;
-  }
-</style>
 <template>
   <div>
     <h3>WorkflowExecution Detail</h3>
@@ -62,8 +55,10 @@
         </div>
       </div>
       <div>
-        <h4>Dependency Graph</h4>
-        <div id="mynetwork" ref="mynetwork"></div>
+        <h4>Workflow Graph</h4>
+        <svg id="workflowDag">
+          <g></g>
+        </svg>
       </div>
     </div>
   </div>
@@ -71,7 +66,8 @@
 
 <script>
 import JobnetesApi from '@/external/jobnetesApi'
-import vis from 'vis'
+import dagreD3 from 'dagreD3'
+import * as d3 from 'd3'
 
 export default {
   name: 'WorkflowExecutionDetail',
@@ -79,7 +75,54 @@ export default {
   data: function () {
     return {
       wfExec: null,
-      network: null
+      dag: null
+    }
+  },
+  methods: {
+    renderDag: function () {
+      if (this.dag !== null || this.wfExec === null) {
+        return
+      }
+      let g = new dagreD3.graphlib.Graph()
+      this.dag = g
+      g.setGraph({
+        rankdir: 'LR'
+      })
+      g.setDefaultEdgeLabel(function () {
+        return {}
+      })
+
+      this.wfExec.taskExecutions.forEach(te => {
+        g.setNode(te.id, {label: te.taskName})
+        if (te.parentId > 0) {
+          g.setEdge(te.parentId, te.id)
+        }
+      })
+
+      g.nodes().forEach(function (v) {
+        if (v !== undefined) {
+          let node = g.node(v)
+          // Round the corners of the nodes
+          node.rx = node.ry = 5
+        }
+      })
+
+      // eslint-disable-next-line
+      let render = new dagreD3.render()
+
+      let svg = d3.select('#workflowDag')
+      render(d3.select('#workflowDag g'), g)
+      svg.attr('height', g.graph().height)
+      svg.attr('width', g.graph().width)
+
+      d3.selectAll('svg rect')
+        .on('mouseover', function (d) {
+          console.log('mouseover')
+        })
+        .on('click', function (d) {
+          console.log('click')
+          console.log(d)
+        })
     }
   },
   beforeRouteEnter: function (route, redirect, next) {
@@ -101,43 +144,7 @@ export default {
       })
   },
   updated: function () {
-    // TODO: vis.jsのサンプル
-    let container = this.$refs.mynetwork
-    if (this.network !== null || container === undefined || container === null) {
-      return
-    }
-
-    let nodes = new vis.DataSet([
-      {id: 1, label: 'Node 1'},
-      {id: 2, label: 'Node 2'},
-      {id: 3, label: 'Node 3'},
-      {id: 4, label: 'Node 4'},
-      {id: 5, label: 'Node 5'}
-    ])
-
-    // create an array with edges
-    let edges = new vis.DataSet([
-      {from: 1, to: 3},
-      {from: 1, to: 2},
-      {from: 2, to: 4},
-      {from: 2, to: 5}
-    ])
-
-    // provide the data in the vis format
-    let d = {
-      nodes: nodes,
-      edges: edges
-    }
-    let options = {
-    }
-
-    // initialize your network!
-    this.network = new vis.Network(container, d, options)
-    this.network.on('click', function (properties) {
-      let ids = properties.nodes
-      let clickedNodes = nodes.get(ids)
-      console.log('clicked nodes:', clickedNodes)
-    })
+    this.renderDag()
   }
 }
 </script>

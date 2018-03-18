@@ -3,6 +3,12 @@
     <h3>WorkflowExecution Detail</h3>
     <div v-if="wfExec !== null">
       <div>
+        <h4>Task Execution Graph</h4>
+        <svg id="workflowDag">
+          <g></g>
+        </svg>
+      </div>
+      <div>
         <div>
           <h4>Workflow</h4>
           <table class="highlight bordered">
@@ -54,12 +60,6 @@
           </table>
         </div>
       </div>
-      <div>
-        <h4>Workflow Graph</h4>
-        <svg id="workflowDag">
-          <g></g>
-        </svg>
-      </div>
     </div>
   </div>
 </template>
@@ -92,8 +92,21 @@ export default {
         return {}
       })
 
+      let getClassOfStatus = s => {
+        switch (s) {
+          case 0:
+            return 'running'
+          case 1:
+            return 'success'
+          case 2:
+            return 'failure'
+          default:
+            return 'unknown'
+        }
+      }
+
       this.wfExec.taskExecutions.forEach(te => {
-        g.setNode(te.id, {label: te.taskName})
+        g.setNode(te.id, {label: te.taskName, class: getClassOfStatus(te.status)})
         if (te.parentId > 0) {
           g.setEdge(te.parentId, te.id)
         }

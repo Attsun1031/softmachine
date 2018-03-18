@@ -9,8 +9,9 @@
         </ul>
       </div>
     </nav>
-    <router-view/>
-
+    <div id="main-contents">
+      <router-view/>
+    </div>
     <footer class="page-footer teal">
       <div class="footer-copyright">
         <div class="container">

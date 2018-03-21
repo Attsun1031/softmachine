@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/Attsun1031/jobnetes/di"
+	"github.com/Attsun1031/jobnetes/kubernetes"
 	"github.com/Attsun1031/jobnetes/utils/config"
 	"github.com/Attsun1031/jobnetes/utils/log"
 	"github.com/Attsun1031/jobnetes/webadmin/server/api"
@@ -28,6 +29,7 @@ func main() {
 	//	webAdminConfig.Username: webAdminConfig.Password,
 	//}))
 
+	kubeClient := kubernetes.GetClient(config.JobnetesConfig.KubernetesConfig)
 	apiV1 := router.Group("/api/v1")
 	{
 		apiV1.GET("/workflow", api.WorkflowApi)
@@ -39,6 +41,14 @@ func main() {
 			WorkflowDao:          di.InjectWorkflowDao(),
 			WorkflowExecutionDao: di.InjectWorkflowExecutionDao(),
 			TaskExecutionDao:     di.InjectTaskExecutionDao(),
+		}).Get)
+		apiV1.GET("/task/:id/pod", (&api.TaskExecutionApi{
+			TaskExecutionDao: di.InjectTaskExecutionDao(),
+			Client:           kubeClient,
+		}).GetPods)
+		apiV1.GET("/task/:id/pod/:pod/:container/log", (&api.TaskExecutionLogApi{
+			TaskExecutionDao: di.InjectTaskExecutionDao(),
+			Client:           kubeClient,
 		}).Get)
 	}
 

@@ -20,6 +20,13 @@ text {
 }
 
 /* Workflow detail graph */
+svg#workflowDag {
+  width: auto;
+  height: auto;
+  padding: 50px;
+  border: thin solid;
+}
+
 g.running > rect {
   fill: #36a8ff;
 }

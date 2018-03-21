@@ -50,7 +50,7 @@
             <tbody>
             <tr v-for="task in wfExec.taskExecutions" :key="task.id">
               <td>{{ task.id }}</td>
-              <td>{{ task.status }}</td>
+              <td>{{ getStatusLabel(task.status) }}</td>
               <td>{{ task.taskName }}</td>
               <td>{{ task.executionName }}</td>
               <td>{{ task.startedAt }}</td>
@@ -79,6 +79,18 @@ export default {
     }
   },
   methods: {
+    getStatusLabel: function (status) {
+      switch (status) {
+        case 0:
+          return 'running'
+        case 1:
+          return 'success'
+        case 2:
+          return 'failure'
+        default:
+          return 'unknown'
+      }
+    },
     renderDag: function () {
       if (this.dag !== null || this.wfExec === null) {
         return
@@ -92,21 +104,8 @@ export default {
         return {}
       })
 
-      let getClassOfStatus = s => {
-        switch (s) {
-          case 0:
-            return 'running'
-          case 1:
-            return 'success'
-          case 2:
-            return 'failure'
-          default:
-            return 'unknown'
-        }
-      }
-
       this.wfExec.taskExecutions.forEach(te => {
-        g.setNode(te.id, {label: te.taskName, class: getClassOfStatus(te.status)})
+        g.setNode(te.id, {label: te.taskName, class: this.getStatusLabel(te.status)})
         if (te.parentId > 0) {
           g.setEdge(te.parentId, te.id)
         }

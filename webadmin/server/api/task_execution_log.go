@@ -3,8 +3,6 @@ package api
 import (
 	"net/http"
 
-	"time"
-
 	"strconv"
 
 	"github.com/Attsun1031/jobnetes/dao"
@@ -19,12 +17,6 @@ import (
 type TaskExecutionLogApi struct {
 	Client           kubernetes.Interface
 	TaskExecutionDao dao.TaskExecutionDao
-}
-
-type PodLogResponse struct {
-	Name      string
-	StartTime time.Time
-	Log       string
 }
 
 func (api TaskExecutionLogApi) Get(c *gin.Context) {

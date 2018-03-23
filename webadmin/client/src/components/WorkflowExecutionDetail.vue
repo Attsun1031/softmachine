@@ -48,7 +48,7 @@
             </thead>
 
             <tbody>
-            <tr v-for="task in wfExec.taskExecutions" :key="task.id">
+            <tr v-for="task in wfExec.taskExecutions" :key="task.id" v-on:click="onClickTask(task.id)">
               <td>{{ task.id }}</td>
               <td>{{ getStatusLabel(task.status) }}</td>
               <td>{{ task.taskName }}</td>
@@ -79,6 +79,14 @@ export default {
     }
   },
   methods: {
+    onClickTask: function (tid) {
+      this.$router.push({
+        name: 'TaskExecutionLog',
+        params: {
+          taskId: tid
+        }
+      })
+    },
     getStatusLabel: function (status) {
       switch (status) {
         case 0:

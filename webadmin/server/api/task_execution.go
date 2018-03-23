@@ -23,9 +23,9 @@ type TaskExecutionApi struct {
 }
 
 type PodResponse struct {
-	PodName    string
-	StartTime  time.Time
-	Containers []string
+	PodName    string    `json:"podName"`
+	StartTime  time.Time `json:"startTime"`
+	Containers []string  `json:"containers"`
 }
 
 func (api TaskExecutionApi) GetPods(c *gin.Context) {

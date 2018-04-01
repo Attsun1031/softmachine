@@ -63,7 +63,7 @@ func (api TaskExecutionApi) GetPods(c *gin.Context) {
 
 	// sort by start time desc
 	sort.SliceStable(pods, func(i, j int) bool {
-		return pods[i].Status.StartTime.Before(pods[j].Status.StartTime)
+		return pods[i].Status.StartTime.After(pods[j].Status.StartTime.Time)
 	})
 
 	podResponses := make([]*PodResponse, len(pods))

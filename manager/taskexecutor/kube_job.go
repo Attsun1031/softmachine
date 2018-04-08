@@ -19,15 +19,16 @@ type KubeJobTaskExecutor struct {
 	KubeClient       kubernetes.Interface
 }
 
-func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB, input string, parentID uint) error {
+func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB, input string, parentId uint, prevId uint) (*model.TaskExecution, error) {
 	task := executor.Task
-	log.Logger.Infof("Requesting k8s task. ExecutionName=%s Type=%s ParentID=%v", task.Name, task.GetJobType(), parentID)
+	log.Logger.Infof("Requesting k8s task. ExecutionName=%v Type=%v ParentId=%v PrevId=%v", task.Name, task.GetJobType(), parentId, prevId)
 
 	// create execution record
 	startedAt := time.Now()
 	te := &model.TaskExecution{
 		WorkflowExecution:     we,
-		ParentTaskExecutionID: parentID,
+		ParentTaskExecutionID: parentId,
+		PrevTaskExecutionID:   prevId,
 		TaskName:              task.Name,
 		TaskType:              task.GetJobType(),
 		StartedAt:             &startedAt,
@@ -37,7 +38,7 @@ func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *go
 	}
 	err := executor.TaskExecutionDao.Update(te, db)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	name := fmt.Sprintf(
@@ -49,7 +50,7 @@ func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *go
 	te.ExecutionName = name
 	err = executor.TaskExecutionDao.Update(te, db)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	// start kubernetes job
@@ -59,5 +60,5 @@ func (executor *KubeJobTaskExecutor) Execute(we *model.WorkflowExecution, db *go
 		BatchV1().
 		Jobs(config.JobnetesConfig.KubernetesConfig.JobNamespace).
 		Create(&spec)
-	return err
+	return te, err
 }

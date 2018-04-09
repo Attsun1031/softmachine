@@ -32,13 +32,9 @@ func (poller *KubeJobTaskPoller) Poll(te *model.TaskExecution, db *gorm.DB) (boo
 
 	switch lastCondition.Type {
 	case v1.JobComplete:
-		te.Status = model.TaskSuccess
-		te.EndedAt = &result.Status.CompletionTime.Time
+		te.MarkSuccess(&result.Status.CompletionTime.Time)
 	default:
-		te.Status = model.TaskFailed
-		te.EndedAt = &lastCondition.LastProbeTime.Time
-		te.ErrorReason = lastCondition.Reason
-		te.ErrorMsg = lastCondition.Message
+		te.MarkFailed(&lastCondition.LastProbeTime.Time, lastCondition.Reason, lastCondition.Message)
 	}
 	err = poller.TaskExecutionDao.Update(te, db)
 	if err != nil {

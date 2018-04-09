@@ -38,12 +38,12 @@ func (poller *ParallelJobTaskPoller) Poll(te *model.TaskExecution, db *gorm.DB) 
 	// check if all child task completed
 	if expectedChildCount == actualCompletedChildCount {
 		endedAt := time.Now()
-		te.EndedAt = &endedAt
 		if hasFailedTask {
 			te.Status = model.TaskFailed
-			te.ErrorReason = "Some child job failed."
+			te.MarkFailed(&endedAt, "Some child job failed.", "")
 		} else {
 			te.Status = model.TaskSuccess
+			te.MarkSuccess(&endedAt)
 		}
 		err = poller.TaskExecutionDao.Update(te, db)
 		if err != nil {

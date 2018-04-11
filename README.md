@@ -16,3 +16,5 @@ kubernetes workflow engine
 ## Setup local k8s env
 1. start local kubernetes
 1. apply `setting/k8s/deploy-mysql.yaml`
+1. apply `setting/k8s/cm-config.yaml`
+1. apply `setting/k8s/job-migration.yaml`

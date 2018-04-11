@@ -6,7 +6,18 @@ spec:
   template:
     spec:
       containers:
-      - name: pi
-        image: attsun/jobnetes-migration:latest
+        - name: jobnetes-migration
+          image: attsun/jobnetes-migration:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/jobnetes
+      volumes:
+        - name: config-volume
+          configMap:
+            name: jobnetes-configs-v2018.04.11.1
+            items:
+            - key: app.config
+              path: config.yaml
       restartPolicy: Never
   backoffLimit: 1

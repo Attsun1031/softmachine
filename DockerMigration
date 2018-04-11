@@ -1,5 +1,12 @@
-FROM golang:1.10.1-alpine3.7
-RUN mkdir /etc/jobnetes
-COPY setting/config-example.yaml /etc/jobnetes/config.yaml
-COPY cmd/dbmigration/dbmigration /usr/local/bin
-CMD ["/usr/local/bin/dbmigration"]
+# BUild stage
+FROM golang:1.10.1-alpine3.7 as build
+ENV GOOS=linux
+ENV GOARCH=amd64
+ADD . /go/src/github.com/Attsun1031/jobnetes
+WORKDIR /go/src/github.com/Attsun1031/jobnetes/cmd/dbmigration
+RUN go build dbmigration.go
+
+# Runtime stage
+FROM alpine:3.7
+COPY --from=build /go/src/github.com/Attsun1031/jobnetes/cmd/dbmigration/dbmigration /dbmigration
+CMD ["/dbmigration"]

@@ -9,7 +9,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-const pollIntervalSec = 10 * time.Second
+const pollInterval = 10 * time.Second
 
 type WorkflowManagerMain struct {
 	Db                                 *gorm.DB
@@ -21,10 +21,11 @@ func (manager *WorkflowManagerMain) Run() {
 	for {
 		log.Logger.Info("Looping")
 		manager.processWorkflowState()
-		time.Sleep(pollIntervalSec)
+		time.Sleep(pollInterval)
 	}
 }
 
+// TODO: retry failed workflow
 func (manager *WorkflowManagerMain) processWorkflowState() {
 	// Load running workflows
 	log.Logger.Info("Running workflow state manager")

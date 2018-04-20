@@ -4,7 +4,7 @@ db:
   user: root
   password: password
   host: mysql
-  port: 30306
+  port: 3306
 k8s:
   in-cluster: true
   job-namespace: default

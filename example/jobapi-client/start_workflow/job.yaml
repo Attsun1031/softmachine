@@ -8,6 +8,6 @@ spec:
       containers:
       - name: jobnetes-api-client-example-start-workflow
         image: attsun/jobnetes-api-client-example-start-workflow:latest
-        args: ["-endpoint", "jobnetes-api-server:50051", "-workflow-id", "1", "-exec-name", "pi-test"]
+        args: ["-endpoint", "jobnetes-api-server:50051", "-workflow-id", "2", "-exec-name", "para-seq-test1"]
       restartPolicy: Never
   backoffLimit: 1

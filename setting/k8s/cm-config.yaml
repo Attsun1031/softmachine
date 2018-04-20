@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: jobnetes-configs-v2018.04.11.1
+  namespace: default
+data:
+  app.config: |-
+    log:
+      level: info
+    db:
+      user: root
+      password: password
+      host: mysql
+      port: 3306
+    k8s:
+      in-cluster: true
+      job-namespace: default
+    jobapi:
+      port: 50051
+      username: jobnetesadmin
+      password: test
+    webadmin:
+      port: 8081
+      username: jobnetesadmin
+      password: test

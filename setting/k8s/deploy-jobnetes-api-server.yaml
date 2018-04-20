@@ -1,13 +1,3 @@
-apiVersion: v1
-kind: Service
-metadata:
-  name: jobnetes-api-server
-spec:
-  ports:
-    - port: 50051
-  selector:
-    app: jobnetes-api-server
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:

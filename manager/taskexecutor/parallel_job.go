@@ -17,15 +17,16 @@ type ParallelJobTaskExecutor struct {
 	TaskExecutorFactory Factory
 }
 
-func (executor *ParallelJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB, input string, parentID uint) error {
+func (executor *ParallelJobTaskExecutor) Execute(we *model.WorkflowExecution, db *gorm.DB, input string, parentId uint, prevId uint) (*model.TaskExecution, error) {
 	task := executor.Task
-	log.Logger.Infof("Requesting parallel task. ExecutionName=%s Type=%s ParentID", task.Name, task.GetJobType(), parentID)
+	log.Logger.Infof("Requesting parallel task. ExecutionName=%v Type=%v ParentId=%v PrevId=%v", task.Name, task.GetJobType(), parentId, prevId)
 
 	// create execution record
 	startedAt := time.Now()
 	te := &model.TaskExecution{
 		WorkflowExecution:     we,
-		ParentTaskExecutionID: parentID,
+		ParentTaskExecutionID: parentId,
+		PrevTaskExecutionID:   prevId,
 		TaskName:              task.Name,
 		TaskType:              task.GetJobType(),
 		StartedAt:             &startedAt,
@@ -35,7 +36,7 @@ func (executor *ParallelJobTaskExecutor) Execute(we *model.WorkflowExecution, db
 	}
 	err := executor.TaskExecutionDao.Update(te, db)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	name := fmt.Sprintf(
@@ -47,7 +48,7 @@ func (executor *ParallelJobTaskExecutor) Execute(we *model.WorkflowExecution, db
 	te.ExecutionName = name
 	err = executor.TaskExecutionDao.Update(te, db)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	executors := make([]TaskExecutor, len(task.TaskSets))
@@ -55,7 +56,7 @@ func (executor *ParallelJobTaskExecutor) Execute(we *model.WorkflowExecution, db
 		startTask := taskSet[0]
 		executor, err := executor.TaskExecutorFactory.GetTaskExecutor(startTask)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		executors = append(executors, executor)
 	}
@@ -64,10 +65,10 @@ func (executor *ParallelJobTaskExecutor) Execute(we *model.WorkflowExecution, db
 		if executor == nil {
 			continue
 		}
-		err = executor.Execute(we, db, input, te.ID)
+		_, err = executor.Execute(we, db, input, te.ID, prevId)
 		if err != nil {
-			return err
+			return nil, err
 		}
 	}
-	return nil
+	return te, nil
 }

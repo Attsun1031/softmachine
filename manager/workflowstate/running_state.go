@@ -24,7 +24,6 @@ type RunningStateProcessor struct {
 	KubeClient           kubernetes.Interface
 }
 
-// TODO: retry failed workflow
 func (processor *RunningStateProcessor) ToNextState(execution *model.WorkflowExecution, db *gorm.DB) (bool, error) {
 	// check current running task
 	succeededTasks, err := checkRunningTask(processor, execution, db)
@@ -104,9 +103,15 @@ func runNextTask(processor *RunningStateProcessor, execution *model.WorkflowExec
 		if err != nil {
 			return runNextTask, err
 		}
-		err = executor.Execute(execution, db, te.Output, te.ParentTaskExecutionID)
+		var executed *model.TaskExecution
+		executed, err = executor.Execute(execution, db, te.Output, te.ParentTaskExecutionID, te.ID)
 		if err != nil {
 			return runNextTask, errors.New(fmt.Sprintf("Failed to request task. ExecutionName=%s cause=%s", next.GetName(), err))
+		}
+		te.NextTaskExecution = executed
+		err = processor.TaskExecutionDao.Update(te, db)
+		if err != nil {
+			return runNextTask, errors.New(fmt.Sprintf("Failed to set NextTaskExecution to successed task. SucceededTaskId=%v NextTaskId=%v cause=%s", te.ID, executed.ID, err))
 		}
 	}
 	return runNextTask, nil

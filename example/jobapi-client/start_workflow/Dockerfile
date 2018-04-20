@@ -1,3 +1,3 @@
-FROM golang:1.9.2-alpine3.7
-COPY start_workflow /usr/local/bin
-ENTRYPOINT ["/usr/local/bin/start_workflow"]
+FROM alpine:3.7
+COPY start_workflow /app
+ENTRYPOINT ["/app/start_workflow"]

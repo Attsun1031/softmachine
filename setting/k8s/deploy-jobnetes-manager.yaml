@@ -13,5 +13,16 @@ spec:
         app: jobnetes-manager
     spec:
       containers:
-      - name: jobnetes-manager
-        image: attsun/jobnetes-manager:latest
+        - name: jobnetes-manager
+          image: attsun/jobnetes-manager:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/jobnetes
+      volumes:
+        - name: config-volume
+          configMap:
+            name: jobnetes-configs-v2018.04.11.1
+            items:
+            - key: app.config
+              path: config.yaml

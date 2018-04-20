@@ -1,5 +1,0 @@
-FROM golang:1.9.2-alpine3.7
-RUN mkdir /etc/jobnetes
-COPY setting/config-example.yaml /etc/jobnetes/config.yaml
-COPY cmd/jobnetesmanager/jobnetes-manager /usr/local/bin
-CMD ["/usr/local/bin/jobnetes-manager"]

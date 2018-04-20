@@ -21,3 +21,4 @@ vendor/
 # webadmin
 webadmin/node_modules
 webadmin/*.log
+webadmin/client/package-lock.json

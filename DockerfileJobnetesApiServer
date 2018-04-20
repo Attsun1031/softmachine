@@ -1,6 +1,0 @@
-FROM golang:1.9.2-alpine3.7
-RUN mkdir /etc/jobnetes
-COPY setting/config-example.yaml /etc/jobnetes/config.yaml
-COPY jobapi/jobapi-server /usr/local/bin
-EXPOSE 50051
-CMD ["/usr/local/bin/jobapi-server"]

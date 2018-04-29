@@ -8,7 +8,6 @@
           {{ pod.podName }}
         </option>
       </select>
-      <span>{{ currentPod }}</span>
 
       <label for="container-select">Container</label>
       <select v-if="currentPod" v-model="currentContainer" id="container-select" class="browser-default">
@@ -16,7 +15,6 @@
           {{ container }}
         </option>
       </select>
-      <span>{{ currentContainer }}</span>
 
       <h5>Log</h5>
       <div class="card-panel teal lighten-5">

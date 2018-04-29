@@ -38,3 +38,7 @@ g.success > rect {
 g.failure > rect {
   fill: #ffbab7;
 }
+
+g > ellipse {
+  fill: orange;
+}

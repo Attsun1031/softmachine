@@ -34,6 +34,5 @@ func (api *WorkflowExecutionDetailApi) Get(c *gin.Context) {
 	if err != nil {
 		panic(err)
 	}
-	log.Logger.Infof("tasks = %v", len(we.TaskExecutions))
 	c.JSON(http.StatusOK, gin.H{"item": we})
 }

@@ -1,13 +1,23 @@
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: jobnetes-api-client-example-start-workflow
+  name: jobnetes-api-client-example-start-workflow-2018-04-29-19-46
 spec:
   template:
     spec:
       containers:
-      - name: jobnetes-api-client-example-start-workflow
-        image: attsun/jobnetes-api-client-example-start-workflow:latest
-        args: ["-endpoint", "jobnetes-api-server:50051", "-workflow-id", "2", "-exec-name", "para-seq-test1"]
+        - name: jobnetes-api-client-example-start-workflow
+          image: attsun/jobnetes-api-client-example-start-workflow:latest
+          args: ["-endpoint", "jobnetes-api-server:50051", "-workflow-id", "2", "-exec-name", "para-seq-test3"]
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/jobnetes
+      volumes:
+        - name: config-volume
+          configMap:
+            name: jobnetes-configs-v2018.04.11.1
+            items:
+            - key: app.config
+              path: config.yaml
       restartPolicy: Never
   backoffLimit: 1

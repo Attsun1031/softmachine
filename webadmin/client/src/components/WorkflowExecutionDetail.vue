@@ -87,6 +87,12 @@ export default {
         }
       })
     },
+    isParallelJob: function (te) {
+      return te.taskType === 'parallel-job'
+    },
+    getParallelJobEndNodeId: function (te) {
+      return -te
+    },
     getStatusLabel: function (status) {
       switch (status) {
         case 0:
@@ -97,6 +103,13 @@ export default {
           return 'failure'
         default:
           return 'unknown'
+      }
+    },
+    getShape: function (te) {
+      if (this.isParallelJob(te)) {
+        return 'ellipse'
+      } else {
+        return 'rect'
       }
     },
     renderDag: function () {
@@ -112,10 +125,40 @@ export default {
         return {}
       })
 
+      // collect parents
+      let parentJobs = new Map()
+      this.wfExec.taskExecutions.filter(te => te.parentId > 0).forEach(te => {
+        if (!parentJobs.has(te.parentId)) {
+          parentJobs.set(te.parentId, [])
+        }
+        parentJobs.get(te.parentId).push(te)
+      })
+
+      // TODO: 並列タスクの完了を示すノードを作る
       this.wfExec.taskExecutions.forEach(te => {
-        g.setNode(te.id, {label: te.taskName, class: this.getStatusLabel(te.status)})
-        if (te.parentId > 0) {
+        g.setNode(te.id, {label: te.taskName, class: this.getStatusLabel(te.status), shape: this.getShape(te)})
+        if (parentJobs.has(te.id) && this.getStatusLabel(te.status) !== 'running') {
+          g.setNode(this.getParallelJobEndNodeId(te), {label: 'END OF PARALLEL', class: this.getStatusLabel(te.status), shape: this.getShape(te)})
+        }
+
+        // draw parent node to initial child nodes
+        if (te.parentId > 0 && te.prevId === 0) {
           g.setEdge(te.parentId, te.id)
+        }
+
+        // draw to next
+        if (te.nextId > 0) {
+          if (parentJobs.has(te.id)) {
+            // draw end node to next
+            let endNodeId = this.getParallelJobEndNodeId(te)
+            g.setEdge(endNodeId, te.nextId)
+            // draw next from end children
+            parentJobs.get(te.id).filter(te => te.nextId === 0).forEach(ec => {
+              g.setEdge(ec.id, endNodeId)
+            })
+          } else {
+            g.setEdge(te.id, te.nextId)
+          }
         }
       })
 

@@ -19,7 +19,7 @@ limitations under the License.
 package versioned
 
 import (
-	jobnetesv1beta "github.com/attsun1031/jobnetes/pkg/client/clientset/versioned/typed/jobnetes/v1beta"
+	jobnetesv1beta "github.com/Attsun1031/jobnetes/pkg/client/clientset/versioned/typed/jobnetes/v1beta"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"

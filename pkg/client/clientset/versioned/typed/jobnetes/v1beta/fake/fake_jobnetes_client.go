@@ -19,7 +19,7 @@ limitations under the License.
 package fake
 
 import (
-	v1beta "github.com/attsun1031/jobnetes/pkg/client/clientset/versioned/typed/jobnetes/v1beta"
+	v1beta "github.com/Attsun1031/jobnetes/pkg/client/clientset/versioned/typed/jobnetes/v1beta"
 	rest "k8s.io/client-go/rest"
 	testing "k8s.io/client-go/testing"
 )

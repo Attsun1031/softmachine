@@ -11,7 +11,12 @@ type Workflow struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
 
+	Status WorkflowStatus `json:"status"`
 	Spec   WorkflowSpec   `json:"spec"`
+}
+
+type WorkflowStatus struct {
+	Name string `json:"name"`
 }
 
 // WorkflowSpec is the spec for a Workflow resource
@@ -28,4 +33,3 @@ type WorkflowList struct {
 
 	Items []Workflow `json:"items"`
 }
-

@@ -19,7 +19,7 @@ limitations under the License.
 package scheme
 
 import (
-	jobnetesv1beta "github.com/attsun1031/jobnetes/pkg/apis/jobnetes/v1beta"
+	jobnetesv1beta "github.com/Attsun1031/jobnetes/pkg/apis/jobnetes/v1beta"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

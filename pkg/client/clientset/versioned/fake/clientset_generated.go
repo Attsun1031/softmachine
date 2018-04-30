@@ -20,8 +20,8 @@ package fake
 
 import (
 	clientset "github.com/Attsun1031/jobnetes/pkg/client/clientset/versioned"
-	jobnetesv1beta "github.com/attsun1031/jobnetes/pkg/client/clientset/versioned/typed/jobnetes/v1beta"
-	fakejobnetesv1beta "github.com/attsun1031/jobnetes/pkg/client/clientset/versioned/typed/jobnetes/v1beta/fake"
+	jobnetesv1beta "github.com/Attsun1031/jobnetes/pkg/client/clientset/versioned/typed/jobnetes/v1beta"
+	fakejobnetesv1beta "github.com/Attsun1031/jobnetes/pkg/client/clientset/versioned/typed/jobnetes/v1beta/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"

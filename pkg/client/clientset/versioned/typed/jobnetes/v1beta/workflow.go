@@ -37,6 +37,7 @@ type WorkflowsGetter interface {
 type WorkflowInterface interface {
 	Create(*v1beta.Workflow) (*v1beta.Workflow, error)
 	Update(*v1beta.Workflow) (*v1beta.Workflow, error)
+	UpdateStatus(*v1beta.Workflow) (*v1beta.Workflow, error)
 	Delete(name string, options *v1.DeleteOptions) error
 	DeleteCollection(options *v1.DeleteOptions, listOptions v1.ListOptions) error
 	Get(name string, options v1.GetOptions) (*v1beta.Workflow, error)
@@ -114,6 +115,22 @@ func (c *workflows) Update(workflow *v1beta.Workflow) (result *v1beta.Workflow, 
 		Namespace(c.ns).
 		Resource("workflows").
 		Name(workflow.Name).
+		Body(workflow).
+		Do().
+		Into(result)
+	return
+}
+
+// UpdateStatus was generated because the type contains a Status member.
+// Add a +genclient:noStatus comment above the type to avoid generating UpdateStatus().
+
+func (c *workflows) UpdateStatus(workflow *v1beta.Workflow) (result *v1beta.Workflow, err error) {
+	result = &v1beta.Workflow{}
+	err = c.client.Put().
+		Namespace(c.ns).
+		Resource("workflows").
+		Name(workflow.Name).
+		SubResource("status").
 		Body(workflow).
 		Do().
 		Into(result)

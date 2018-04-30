@@ -25,16 +25,10 @@ import (
 const controllerAgentName = "jobnetes-controller"
 
 const (
-	// SuccessSynced is used as part of the Event 'reason' when a Foo is synced
+	// SuccessSynced is used as part of the Event 'reason' when a Workflow is synced
 	SuccessSynced = "Synced"
-	// ErrResourceExists is used as part of the Event 'reason' when a Foo fails
-	// to sync due to a Deployment of the same name already existing.
-	ErrResourceExists = "ErrResourceExists"
 
-	// MessageResourceExists is the message used for Events when a resource
-	// fails to sync due to a Deployment already existing
-	MessageResourceExists = "Resource %q already exists and is not managed by Foo"
-	// MessageResourceSynced is the message used for an Event fired when a Foo
+	// MessageResourceSynced is the message used for an Event fired when a Workflow
 	// is synced successfully
 	MessageResourceSynced = "Workflow synced successfully"
 )
@@ -64,13 +58,11 @@ func NewController(
 	jobnetesClientset clientset.Interface,
 	jobnetesInformerFactory informers.SharedInformerFactory) *Controller {
 
-	// obtain references to shared index informers for the Deployment and Workflow
-	// types.
+	// obtain references to shared index informers for the Workflow types.
 	wfInformer := jobnetesInformerFactory.Jobnetes().V1beta().Workflows()
 
 	// Create event broadcaster
-	// Add sample-controller types to the default Kubernetes Scheme so Events can be
-	// logged for sample-controller types.
+	// Add controller types to the default Kubernetes Scheme so Events can be logged for controller types.
 	jobnetesscheme.AddToScheme(scheme.Scheme)
 	log.Logger.Info("Creating event broadcaster")
 
@@ -121,7 +113,7 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) error {
 	defer c.workqueue.ShutDown()
 
 	// Start the informer factories to begin populating the informer caches
-	log.Logger.Info("Starting Foo controller")
+	log.Logger.Info("Starting Workflow controller")
 
 	// Wait for the caches to be synced before starting workers
 	log.Logger.Info("Waiting for informer caches to sync")
@@ -130,7 +122,7 @@ func (c *Controller) Run(threadiness int, stopCh <-chan struct{}) error {
 	}
 
 	log.Logger.Info("Starting workers")
-	// Launch two workers to process Foo resources
+	// Launch two workers to process Workflow resources
 	for i := 0; i < threadiness; i++ {
 		go wait.Until(c.runWorker, time.Second, stopCh)
 	}
@@ -184,7 +176,7 @@ func (c *Controller) processNextWorkItem() bool {
 			return nil
 		}
 		// Run the syncHandler, passing it the namespace/name string of the
-		// Foo resource to be synced.
+		// Workflow resource to be synced.
 		if err := c.syncHandler(key); err != nil {
 			return fmt.Errorf("error syncing '%s': %s", key, err.Error())
 		}
@@ -204,7 +196,7 @@ func (c *Controller) processNextWorkItem() bool {
 }
 
 // syncHandler compares the actual state with the desired, and attempts to
-// converge the two. It then updates the Status block of the Foo resource
+// converge the two. It then updates the Status block of the Workflow resource
 // with the current status of the resource.
 func (c *Controller) syncHandler(key string) error {
 	// Convert the namespace/name string into a distinct namespace and name
@@ -214,10 +206,10 @@ func (c *Controller) syncHandler(key string) error {
 		return nil
 	}
 
-	// Get the Foo resource with this namespace/name
+	// Get the Workflow resource with this namespace/name
 	wf, err := c.workflowLister.Workflows(namespace).Get(name)
 	if err != nil {
-		// The Foo resource may no longer exist, in which case we stop
+		// The Workflow resource may no longer exist, in which case we stop
 		// processing.
 		if errors.IsNotFound(err) {
 			runtime.HandleError(fmt.Errorf("workflow '%s' in work queue no longer exists", key))
@@ -236,9 +228,8 @@ func (c *Controller) syncHandler(key string) error {
 		return nil
 	}
 
-	// Finally, we update the status block of the Foo resource to reflect the
-	// current state of the world
-	err = c.updateFooStatus(wf)
+	// Finally, we update the status block of the Workflow resource to reflect the current state of the world
+	err = c.updateWorkflowStatus(wf)
 	if err != nil {
 		return err
 	}
@@ -247,14 +238,14 @@ func (c *Controller) syncHandler(key string) error {
 	return nil
 }
 
-func (c *Controller) updateFooStatus(wf *jobnetesv1beta.Workflow) error {
+func (c *Controller) updateWorkflowStatus(wf *jobnetesv1beta.Workflow) error {
 	// NEVER modify objects from the store. It's a read-only, local cache.
 	// You can use DeepCopy() to make a deep copy of original object and modify this copy
 	// Or create a copy manually for better performance
 	wfCopy := wf.DeepCopy()
 	wfCopy.Status.Name = wf.Spec.Name
 	// If the CustomResourceSubresources feature gate is not enabled,
-	// we must use Update instead of UpdateStatus to update the Status block of the Foo resource.
+	// we must use Update instead of UpdateStatus to update the Status block of the Workflow resource.
 	// UpdateStatus will not allow changes to the Spec of the resource,
 	// which is ideal for ensuring nothing other than resource status has been updated.
 	_, err := c.jobnetesClientset.JobnetesV1beta().Workflows(wf.Namespace).Update(wfCopy)

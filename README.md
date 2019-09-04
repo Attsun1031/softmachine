@@ -1,10 +1,37 @@
 # jobnetes
-kubernetes workflow engine.
+Kubernetes上で稼働するワークフローエンジン。趣味プロジェクトです。
 
-this is my hobby project.
+## ワークフローとは
+ある特定のバッチ処理など、単一のジョブを連鎖させたものがワークフロー。
+airflowやdigdagで扱うものと同じ。
+
+### 他との違い
+ジョブはすべてkubernetesのJobリソースとして起動されるようになっている。
+すべてをkubernetes上で完結させることで、リソース管理や実行管理を統一的に管理できる。
+
+（Argo workflowがこれの最終進化版なイメージ）
 
 # overview
 ![architecture](https://github.com/Attsun1031/jobnetes/raw/master/docs/images/architecture.jpg "architecture")
+
+## 各種コンポーネント説明
+### webadmin
+ワークフローの実行状況の可視化等を行うためのウェブアプリケーション。
+
+### manager
+ワークフロー管理を行うアプリケーション。
+一定の間隔でワークフロー状況をポーリングし、各ジョブ・ワークフローの起動やステータス管理を行う。
+
+### jobapi
+ワークフローの起動リクエストを受け付けたり、各ジョブが後続ジョブのために結果を書き込むために利用する。
+外部アプリケーションからの利用を想定したため、gRPCでやりとりを行うようにすることでクライアントライブラリ生成を簡素化している。
+
+## ワークフロー定義
+jsonでワークフローを定義する。
+以下参照。
+
+## その他
+RDBで管理しているワークフロー情報をカスタムリソースとして登録し、managerやjobapiをcontrollerとして実装すれば、よりKubertenesの恩恵が受けられそう。
 
 # Develop
 ## Setup dev env

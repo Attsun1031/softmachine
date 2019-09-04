@@ -2,7 +2,7 @@
 Kubernetes上で稼働するワークフローエンジン。趣味プロジェクトです。
 
 ## ワークフローとは
-ある特定のバッチ処理など、単一のジョブを連鎖させたものがワークフロー。
+ある特定のバッチ処理などの単一のジョブを連鎖させたものがワークフロー。
 airflowやdigdagで扱うものと同じ。
 
 ### 他との違い
@@ -28,7 +28,10 @@ airflowやdigdagで扱うものと同じ。
 
 ## ワークフロー定義
 jsonでワークフローを定義する。
-以下参照。
+スキーマや例は以下参照。
+
+https://github.com/Attsun1031/jobnetes/blob/master/schema/workflow-schema.json
+https://github.com/Attsun1031/jobnetes/blob/master/schema/test_schema.py
 
 ## その他
 RDBで管理しているワークフロー情報をカスタムリソースとして登録し、managerやjobapiをcontrollerとして実装すれば、よりKubertenesの恩恵が受けられそう。

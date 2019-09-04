@@ -1,8 +1,13 @@
 # jobnetes
-kubernetes workflow engine
+kubernetes workflow engine.
 
-## Developer
-### Setup dev env
+this is my hobby project.
+
+# overview
+![architecture](https://github.com/Attsun1031/jobnetes/raw/master/docs/images/architecture.jpg "architecture")
+
+# Develop
+## Setup dev env
 1. set GOROOT
 1. set GOPATH
 1. clone this repository in $GOPATH/src/github.com/Attsun1031/jobnetes
